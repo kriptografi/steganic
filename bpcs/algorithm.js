@@ -1,10 +1,17 @@
 
 module.exports = function(spec) {
+    console.log(spec)
+
     let image = spec.image
-    let plainFile = spec.plainFile
+    let plainData = spec.data
     let key = spec.key
+
+    let width = image.bitmap.width
+    let height = image.bitmap.height
     
-    console.log(image, plainFile, key)
+    for (let i = 0; i < height; i++)
+        for (let j = 0; j < width; j++)
+            image.setPixelColor(0x000000, j, i)
 
     return image
 }

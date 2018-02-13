@@ -1,4 +1,6 @@
 var jimp = require('jimp')
+var bluebird = require('bluebird')
+var fs = bluebird.promisifyAll(require('fs'))
 var bpcs = require('./algorithm')
 
 module.exports = function (req, res, next) {
@@ -29,14 +31,16 @@ module.exports = function (req, res, next) {
         outputMimeType = jimp.MIME_BMP
         
     jimp.read(stegoImage.path)
-    .then(function(img) {
-        return {'image': img, plainFile, key}
-    })
+    .then(function(plainFile, key, img) {
+        return fs.readFileAsync(plainFile.path).then(function (img, key, data) {
+            return {'image': img, data, key}
+        }.bind(this, img, key))
+    }.bind(this, plainFile, key))
     .then(bpcs)
-    .then(function(img) {
+    .then(function(outputMimeType, img) {
         img.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
             res.send(buffer);
         })
-    })
+    }.bind(this, outputMimeType))
 }
