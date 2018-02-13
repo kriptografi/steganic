@@ -1,4 +1,5 @@
 var jimp = require('jimp')
+var bpcs = require('./algorithm')
 
 module.exports = function (req, res, next) {
     let stegoImage = req.files['image'][0]
@@ -27,10 +28,12 @@ module.exports = function (req, res, next) {
     else
         outputMimeType = jimp.MIME_BMP
         
-    jimp.read(stegoImage.path).then(function(img) {
-        // do stegano
-        return img
-    }).then(function(img) {
+    jimp.read(stegoImage.path)
+    .then(function(img) {
+        return {'image': img, plainFile, key}
+    })
+    .then(bpcs)
+    .then(function(img) {
         img.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
             res.send(buffer);
