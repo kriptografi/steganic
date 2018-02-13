@@ -1,4 +1,28 @@
 
+function complexity(bitplane) {
+    let height = bitplane.length
+    if (height <= 0)
+        return 0
+    let width = bitplane[0].length
+
+    let diff = 0
+    for (let i = 0; i < height; i++)
+        for (let j = 0; j < width; j++) {
+            if (i > 0 && bitplane[i-1][j] != bitplane[i][j])
+                diff++;
+            if (i < height - 1 && bitplane[i+1][j] != bitplane[i][j])
+                diff++;
+            if (j > 0 && bitplane[i][j-1] != bitplane[i][j])
+                diff++;
+            if (j < width - 1 && bitplane[i][j+1] != bitplane[i][j])
+                diff++;
+        }
+    diff /= 2
+
+    let total = height * (width - 1) + width * (height - 1)
+    return diff / total
+}
+
 module.exports = function(spec) {
     console.log(spec)
 
@@ -8,7 +32,7 @@ module.exports = function(spec) {
 
     let width = image.bitmap.width
     let height = image.bitmap.height
-    
+
     for (let i = 0; i < height; i++)
         for (let j = 0; j < width; j++)
             image.setPixelColor(0x000000, j, i)

@@ -22,6 +22,12 @@ module.exports = function (req, res, next) {
         return
     }
 
+    let threshold = Math.abs(Number(req.body.threshold))
+    if (!threshold)
+        threshold = 0.5
+    if (threshold > 1)
+        threshold = 1.0
+
     let outputMimeType = req.body.outputType
     if (!outputMimeType)
         outputMimeType = 'image/bmp'
@@ -31,11 +37,11 @@ module.exports = function (req, res, next) {
         outputMimeType = jimp.MIME_BMP
         
     jimp.read(stegoImage.path)
-    .then(function(plainFile, key, img) {
-        return fs.readFileAsync(plainFile.path).then(function (img, key, data) {
-            return {'image': img, data, key}
-        }.bind(this, img, key))
-    }.bind(this, plainFile, key))
+    .then(function(plainFile, key, threshold, img) {
+        return fs.readFileAsync(plainFile.path).then(function (img, key, threshold, data) {
+            return {'image': img, data, key, threshold}
+        }.bind(this, img, key, threshold))
+    }.bind(this, plainFile, key, threshold))
     .then(bpcs)
     .then(function(outputMimeType, img) {
         img.getBuffer(outputMimeType, function(err, buffer) {
