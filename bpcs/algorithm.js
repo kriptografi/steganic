@@ -1,4 +1,28 @@
 
+function setBit(bit, i) {
+    return bit |= 1 << i
+}
+
+function unsetBit(bit, i) {
+    return bit &= ~(1 << i)
+}
+
+function tooglePbcCgc(bitplane) {
+    let height = bitplane.length
+    if (height <= 0)
+        return 0
+    let width = bitplane[0].length
+
+    let result = []
+    for (let i = 0; i < height; i++) {
+        result[i] = [bitplane[i][0]]
+        for (let j = 1; j < width; j++)
+            result[i][j].push(bitplane[i][j] ^ bitplane[i][j-1])
+    }
+
+    return result
+}
+
 function complexity(bitplane) {
     let height = bitplane.length
     if (height <= 0)
