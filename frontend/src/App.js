@@ -21,10 +21,10 @@ class App extends Component {
           <div className="col" />
           
         </div>
-        <div className="row">
+        <div className="row" style={{marginTop: 50}}>
           <div className="col" />
           <div className="col-8">
-            <h1>Insert Message</h1>
+            <legend>Insert Message</legend>
             <InsertForm />
             <hr/>
             <h1>Retrieve Message</h1>
