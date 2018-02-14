@@ -32,7 +32,7 @@ class InsertForm extends Component {
     data.append('plainFile', this.plainFileInput.files[0])
     data.append('image', this.imageFileInput.files[0])
     data.append('key', this.keyInput.value)
-    data.append('outputType', this.outputTypeBmpInput.checked ? 'image.bmp' : 'image.png')
+    data.append('outputType', this.outputTypeInput.value)
 
     fetch('/stego', {
       method: 'POST',
@@ -53,7 +53,7 @@ class InsertForm extends Component {
     return (
       <div>
 
-        <form>
+        <form action="#">
           <div className="form-group row">
             <label className="col-sm-2 col-form-label">Message</label>
             <div className="col-sm-10">
