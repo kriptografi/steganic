@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "cd frontend && npm run build && cd .. && node ./bin/www"
+    "start": "cd frontend && npm install && npm run build && cd .. && node ./bin/www"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
