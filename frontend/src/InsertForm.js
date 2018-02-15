@@ -38,7 +38,9 @@ class InsertForm extends Component {
       method: 'POST',
       body: data
     }).then((resp) => {
-      return resp.blob()
+      if (resp.status === 200)
+        return resp.blob()
+      return Promise.reject(resp.error)
     }).then(function (resp) {
       this.setState({
         resultImage: URL.createObjectURL(resp)
@@ -53,7 +55,7 @@ class InsertForm extends Component {
     return (
       <div>
 
-        <form action="#">
+        <div>
           <div className="form-group row">
             <label className="col-sm-2 col-form-label">Message</label>
             <div className="col-sm-10">
@@ -92,13 +94,15 @@ class InsertForm extends Component {
             </div>
           </div>
 
-        </form>
-
-        <div className="col-sm-6">
-          <Image alt="plain-image" src={this.state.currentImage} width={200} height={200} />
         </div>
-        <div className="col-sm-6">
-          <Image alt="messaged-image" src={this.state.resultImage} width={200} height={200} />
+
+        <div className="row">
+            <div className="col-sm-6">
+                <Image alt="plain-image" src={this.state.currentImage} width="100%" height="100%" />
+            </div>
+            <div className="col-sm-6">
+                <Image alt="messaged-image" src={this.state.resultImage} width="100%" height="100%" />
+            </div>
         </div>
         
       </div>

@@ -78,8 +78,10 @@ class RetrieveForm extends Component {
 
         </form>
 
-        <div className="col-sm-12">
-          <Image alt="plain-image" align="center" src={this.state.currentImage} width="100%" height={200} />
+        <div className="row">
+          <div className="col-sm-12">
+            <Image alt="plain-image" align="center" src={this.state.currentImage} width="100%" height="100%" />
+          </div>
         </div>
 
       </div>
