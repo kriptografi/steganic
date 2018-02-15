@@ -39,6 +39,7 @@ class InsertForm extends Component {
     data.append('key', this.keyInput.value)
     data.append('threshold', this.thresholdInput.value)
     data.append('outputType', this.outputTypeInput.value)
+    data.append('usingCgc', this.usingCgcInput.checked ? true : false)
 
     fetch('/stego/insert', {
       method: 'POST',
@@ -111,6 +112,17 @@ class InsertForm extends Component {
                 <option value="image/png">PNG</option>
                 <option value="image/bmp">BMP</option>
               </select>
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <div className="col-sm-2" />
+            <div className="col-sm-10">
+              <div className="form-check">
+                <label className="form-check-label">
+                  <input ref={(input) => {this.usingCgcInput = input}} className="form-check-input" type="checkbox" /> Use CGC System
+                </label>
+              </div>
             </div>
           </div>
 

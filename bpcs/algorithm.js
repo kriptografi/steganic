@@ -13,12 +13,11 @@ var generateBitplane = util.generateBitplane
 var putBitplane = util.putBitplane
 
 function insert(spec) {
-    console.log(spec)
-
     let image = spec.image
     let plainFile = spec.plainFile
     let key = spec.key
     let threshold = spec.threshold ? spec.threshold : 0.5
+    let usingCgc = spec.usingCgc ? spec.usingCgc : false
 
     let imageBuffer = undefined
     let dataBuffer = undefined
@@ -61,7 +60,8 @@ function insert(spec) {
         let count = 0
         let messageI = 0
         
-        pbcToCgc(imageBuffer)
+        if (usingCgc)
+            pbcToCgc(imageBuffer)
 
         for (let blockI = 0; blockI + 8 <= height; blockI += 8)
             for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
@@ -88,7 +88,8 @@ function insert(spec) {
                     putBitplane(imageBuffer, blockJ, blockI, bitplaneI, bitplane)
                 }
 
-        cgcToPbc(imageBuffer)
+        if (usingCgc)
+            cgcToPbc(imageBuffer)
 
         if (count < dataBuffer.length)
             return Promise.reject('image too small')
@@ -97,11 +98,10 @@ function insert(spec) {
 }
 
 function retrieve(spec) {
-    console.log(spec)
-    
     let image = spec.image
     let key = spec.key
     let threshold = spec.threshold ? spec.threshold : 0.5
+    let usingCgc = spec.usingCgc ? spec.usingCgc : false
 
     let imageBuffer = undefined
     let width = 0
@@ -117,7 +117,8 @@ function retrieve(spec) {
         let count = 0
         let plainMessage = []
 
-        pbcToCgc(imageBuffer)
+        if (usingCgc)
+            pbcToCgc(imageBuffer)
 
         for (let blockI = 0; blockI + 8 <= height; blockI += 8)
             for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
