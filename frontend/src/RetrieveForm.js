@@ -1,4 +1,7 @@
 import React, { Component } from 'react'
+import 'noty/lib/noty.css'
+import 'noty/lib/themes/nest.css'
+import Noty from 'noty'
 import Image from './Image'
 
 class RetrieveForm extends Component {
