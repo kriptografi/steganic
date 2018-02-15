@@ -6,6 +6,15 @@ class Image extends Component {
     return (
       <div style={{maxWidth: this.props.width, maxHeight: this.props.maxHeight, textAlign: this.props.align}}>
           <img alt={this.props.alt} align="center" src={source} style={{maxWidth: "100%", height: "auto"}}/>
+          <div style={{textAlign:"center"}} >
+          {
+            function() {
+              if (this.props.src) {
+                return <a href={source} download={this.props.filename || "image.png"}>Download</a>
+              }
+            }.apply(this)
+          }
+          </div>
       </div>
     );
   }

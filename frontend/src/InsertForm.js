@@ -6,7 +6,9 @@ class InsertForm extends Component {
     super(props)
     this.state = {
       currentImage: null,
-      resultImage: null
+      resultImage: null,
+      currentImageFilename: null,
+      resultImageFilename: null
     }
 
     this.onImageChange = this.onImageChange.bind(this)
@@ -22,7 +24,7 @@ class InsertForm extends Component {
             currentImage: e.target.result
           })
       }.bind(this);
-
+      this.setState({currentImageFilename: this.imageFileInput.files[0].name})
       reader.readAsDataURL(this.imageFileInput.files[0]);
     }
   }
@@ -43,8 +45,11 @@ class InsertForm extends Component {
         return resp.blob()
       return Promise.reject(resp.error)
     }).then(function (resp) {
+      let filename = this.state.currentImageFilename.split(".").slice(0,-1).join(".") + "-stego"
+
       this.setState({
-        resultImage: URL.createObjectURL(resp)
+        resultImage: URL.createObjectURL(resp),
+        resultImageFilename: filename
       })
     }.bind(this)).catch((error) => {
       console.log(error)
@@ -106,10 +111,22 @@ class InsertForm extends Component {
 
         <div className="row">
             <div className="col-sm-6">
-                <Image alt="plain-image" src={this.state.currentImage} width="100%" height="100%" />
+                <Image
+                  filename={this.state.currentImageFilename}
+                  alt="plain-image"
+                  src={this.state.currentImage}
+                  align="center" 
+                  width="100%"
+                  height="100%" />
             </div>
             <div className="col-sm-6">
-                <Image alt="messaged-image" src={this.state.resultImage} width="100%" height="100%" />
+                <Image
+                  filename={this.state.resultImageFilename}
+                  alt="messaged-image"
+                  src={this.state.resultImage}
+                  align="center"
+                  width="100%"
+                  height="100%" />
             </div>
         </div>
         
