@@ -42,6 +42,11 @@ class RetrieveForm extends Component {
       a.click()
     }).catch((error) => {
       console.log(error)
+      new Noty({
+        text: (error || 'Cannot retrieve message'),
+        type: 'error',
+        theme: 'nest',
+      }).show()
     })
 
   }

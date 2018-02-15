@@ -1,4 +1,7 @@
 import React, { Component } from 'react'
+import 'noty/lib/noty.css'
+import 'noty/lib/themes/nest.css'
+import Noty from 'noty'
 import Image from './Image'
 
 class InsertForm extends Component {
@@ -52,10 +55,18 @@ class InsertForm extends Component {
         resultImageFilename: filename
       })
 
-      alert("Message Inserted")
+      new Noty({
+        text: 'Message Inserted',
+        type: 'success',
+        theme: 'nest',
+      }).show()
     }.bind(this)).catch((error) => {
       console.log(error)
-      alert(error || "Cannot insert image")
+      new Noty({
+        text: (error || 'Cannot insert image'),
+        type: 'error',
+        theme: 'nest',
+      }).show()
     })
 
   }
