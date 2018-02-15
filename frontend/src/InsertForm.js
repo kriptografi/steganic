@@ -51,8 +51,11 @@ class InsertForm extends Component {
         resultImage: URL.createObjectURL(resp),
         resultImageFilename: filename
       })
+
+      alert("Message Inserted")
     }.bind(this)).catch((error) => {
       console.log(error)
+      alert(error || "Cannot insert image")
     })
 
   }
