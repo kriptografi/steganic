@@ -1,87 +1,15 @@
 var jimp = require('jimp')
 var bluebird = require('bluebird')
 var fs = bluebird.promisifyAll(require('fs'))
+var util = require('./util')
 
-function conjugate(bitplane) {
-    let height = bitplane.length
-    if (height <= 0)
-        return 0
-    let width = bitplane[0].length
+var conjugate = util.conjugate
+var pbcToCgc = util.pbcToCgc
+var cgcToPbc = util.cgcToPbc
+var complexity = util.complexity
+var intToArray = util.intToArray
 
-    let result = []
-    for (let i = 0; i < height; i++) {
-        result[i] = []
-        for (let j = 0; j < width; j++)
-            result[i].push(bitplane[i][j] ^ (i % 2) ^ (j % 2))
-    }
-
-    return result
-}
-
-function pbcToCgc(bitplane) {
-    let height = bitplane.length
-    if (height <= 0)
-        return 0
-    let width = bitplane[0].length
-
-    let result = []
-    for (let i = 0; i < height; i++) {
-        result.push([bitplane[i][0]])
-        for (let j = 1; j < width; j++)
-            result[i].push(bitplane[i][j] ^ bitplane[i][j-1])
-    }
-
-    return result
-}
-
-function cgcToPbc(bitplane) {
-    let height = bitplane.length
-    if (height <= 0)
-        return 0
-    let width = bitplane[0].length
-
-    let result = []
-    for (let i = 0; i < height; i++) {
-        result.push([bitplane[i][0]])
-        for (let j = 1; j < width; j++)
-            result[i].push(bitplane[i][j] ^ result[i][j-1])
-    }
-
-    return result
-}
-
-function complexity(bitplane) {
-    let height = bitplane.length
-    if (height <= 0)
-        return 0
-    let width = bitplane[0].length
-
-    let diff = 0
-    for (let i = 0; i < height; i++)
-        for (let j = 0; j < width; j++) {
-            if (i > 0 && bitplane[i-1][j] != bitplane[i][j])
-                diff++;
-            if (i < height - 1 && bitplane[i+1][j] != bitplane[i][j])
-                diff++;
-            if (j > 0 && bitplane[i][j-1] != bitplane[i][j])
-                diff++;
-            if (j < width - 1 && bitplane[i][j+1] != bitplane[i][j])
-                diff++;
-        }
-    diff /= 2
-
-    let total = height * (width - 1) + width * (height - 1)
-    return diff / total
-}
-
-function intToArray(number, size = 8) {
-    let array = []
-    for (let i = 0; i < size; i++)
-        array.push((number >> i) & 1)
-    return array
-}
-
-module.exports = function(spec) {
+function insert(spec) {
     console.log(spec)
 
     let image = spec.image
@@ -184,3 +112,5 @@ module.exports = function(spec) {
         return imageBuffer
     })
 }
+
+module.exports = {insert}

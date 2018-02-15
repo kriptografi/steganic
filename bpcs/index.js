@@ -29,7 +29,7 @@ module.exports = function (req, res, next) {
     if (!outputMimeType)
         outputMimeType = 'image/bmp'
         
-    bpcs({
+    bpcs.insert({
         'image': stegoImage,
         'plainFile': plainFile,
         'key': key,
