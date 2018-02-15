@@ -60,15 +60,14 @@ function insert(spec) {
     .then(() => {
         let count = 0
         let messageI = 0
+        
+        pbcToCgc(imageBuffer)
 
         for (let blockI = 0; blockI + 8 <= height; blockI += 8)
             for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
                 for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
                     // generate bitplane
                     let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
-
-                    // convert to cgc, this is optional actually
-                    // bitplane = pbcToCgc(bitplane)
 
                     // insert message if noisy
                     if (complexity(bitplane) > threshold) {
@@ -85,12 +84,11 @@ function insert(spec) {
                             bitplane = conjugate(bitplane)
                     }
 
-                    // convert back to pbc, optional
-                    // bitplane = cgcToPbc(bitplane)
-
                     // flush bitplane to image
                     putBitplane(imageBuffer, blockJ, blockI, bitplaneI, bitplane)
                 }
+
+        cgcToPbc(imageBuffer)
 
         if (count < dataBuffer.length)
             return Promise.reject('image too small')
@@ -119,14 +117,13 @@ function retrieve(spec) {
         let count = 0
         let plainMessage = []
 
+        pbcToCgc(imageBuffer)
+
         for (let blockI = 0; blockI + 8 <= height; blockI += 8)
             for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
                 for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
                     // generate bitplane
                     let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
-
-                    // convert to cgc, this is optional actually
-                    // bitplane = pbcToCgc(bitplane)
 
                     // retrieve message if noisy
                     if (complexity(bitplane) > threshold) {
@@ -143,22 +140,22 @@ function retrieve(spec) {
 
         let actualMessage = Buffer.alloc(messageSize, 0)
         messageBuffer.copy(actualMessage, 0, payloadOffset)
-        for (let i = 0; i < messageSize; i += 8) {
-            let conjugationMap = messageBuffer.readUInt8(4 + Math.floor(i / 8))
+        // for (let i = 0; i < messageSize; i += 8) {
+        //     let conjugationMap = messageBuffer.readUInt8(4 + Math.floor(i / 8))
             
-            let messagePlane = []
-            for (let j = 0; j < 8; j++) {
-                let byte = ((i + j) < actualMessage.length) ? actualMessage.readUInt8(i + j) : 0
-                messagePlane.push(intToArray(byte))
-            }
+        //     let messagePlane = []
+        //     for (let j = 0; j < 8; j++) {
+        //         let byte = ((i + j) < actualMessage.length) ? actualMessage.readUInt8(i + j) : 0
+        //         messagePlane.push(intToArray(byte))
+        //     }
 
-            // if ((conjugationMap >> (i % 8)) & 1) {
-            //     messagePlane = conjugate(messagePlane)
-            //     for (let j = 0; j < 8; j++)
-            //         if ((i + j) < actualMessage.length)
-            //             actualMessage.writeUInt8(arrayToInt(messagePlane[j]), i + j)
-            // }
-        }
+        //     if ((conjugationMap >> (i % 8)) & 1) {
+        //         messagePlane = conjugate(messagePlane)
+        //         for (let j = 0; j < 8; j++)
+        //             if ((i + j) < actualMessage.length)
+        //                 actualMessage.writeUInt8(arrayToInt(messagePlane[j]), i + j)
+        //     }
+        // }
 
         return actualMessage
     })

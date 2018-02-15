@@ -30,24 +30,24 @@ function conjugate(bitplane) {
     return result
 }
 
-function pbcToCgc(bitplane) {
-    let result = []
-    for (let i = 0; i < 8; i++) {
-        result.push([bitplane[i][0]])
-        for (let j = 1; j < 8; j++)
-            result[i].push(bitplane[i][j] ^ bitplane[i][j-1])
+function pbcToCgc(image) {
+    for (let i = 0; i < image.bitmap.height; i++) {
+        let before = 0
+        for (let j = 0; j < image.bitmap.width; j++) {
+            let current = image.getPixelColor(j, i)
+            image.setPixelColor(before ^ current, j, i)
+            before = current
+        }
     }
-    return result
 }
 
-function cgcToPbc(bitplane) {
-    let result = []
-    for (let i = 0; i < 8; i++) {
-        result.push([bitplane[i][0]])
-        for (let j = 1; j < 8; j++)
-            result[i].push(bitplane[i][j] ^ result[i][j-1])
-    }
-    return result
+function cgcToPbc(image) {
+    for (let i = 0; i < image.bitmap.height; i++)
+        for (let j = 0; j < image.bitmap.width; j++) {
+            let before = j > 0 ? image.getPixelColor(j - 1, i) : 0
+            let current = image.getPixelColor(j, i)
+            image.setPixelColor(before ^ current, j, i)
+        }
 }
 
 function complexity(bitplane) {
