@@ -37,7 +37,7 @@ class RetrieveForm extends Component {
       return resp.blob()
     }).then((resp) => {
       var a = document.createElement('a')
-      a.href = resp
+      a.href = window.URL.createObjectURL(resp)
       a.download = "filename"
       a.click()
     }).catch((error) => {
@@ -50,7 +50,7 @@ class RetrieveForm extends Component {
     return (
       <div style={{marginBottom: 50}}>
 
-        <form action="#">
+        <form>
 
           <div className="form-group row">
             <label className="col-sm-2 col-form-label">Image</label>
