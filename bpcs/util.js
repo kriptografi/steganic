@@ -1,3 +1,25 @@
+function generateBitplane(image, x, y, bitplane) {
+    result = []
+    for (let i = 0; i < 8; i++) {
+        result.push([])
+        for (let j = 0; j < 8; j++)
+            result[i].push((image.getPixelColor(x + j, y + i) & (1<<bitplane)) ? 1 : 0)
+    }
+    return result
+}
+
+function putBitplane(image, x, y, layer, bitplane) {
+    for (let i = 0; i < 8; i++)
+        for (let j = 0; j < 8; j++) {
+            let color = image.getPixelColor(x + j, y + i)
+            if (bitplane[i][j])
+                color |= 1 << layer
+            else
+                color &= ~(1 << layer)
+            image.setPixelColor(color, x + j, y + i)
+        }
+}
+
 function conjugate(bitplane) {
     let result = []
     for (let i = 0; i < 8; i++) {
@@ -51,4 +73,11 @@ function intToArray(number, size = 8) {
     return array
 }
 
-module.exports = { conjugate, pbcToCgc, cgcToPbc, complexity, intToArray }
+function arrayToInt(array) {
+    let num = 0
+    for (let i = 0; i < array.length; i++)
+        num |= array[i] << i
+    return num
+}
+
+module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt }

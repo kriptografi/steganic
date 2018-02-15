@@ -1,6 +1,6 @@
 var bpcs = require('./algorithm')
 
-module.exports = function (req, res, next) {
+function insert(req, res, next) {
     let stegoImage = req.files['image'][0]
     if (!stegoImage) {
         res.status(500).send('Must provide image file')
@@ -43,3 +43,37 @@ module.exports = function (req, res, next) {
         res.status(500).send(error)
     })
 }
+
+function retrieve(req, res, next) {
+    let stegoImage = req.files['image'][0]
+    if (!stegoImage) {
+        res.status(500).send('Must provide image file')
+        return
+    }
+
+    let key = req.body.key
+    if (!key) {
+        res.status(500).send('Must specify key')
+        return
+    }
+
+    let threshold = Number(req.body.threshold)
+    if (!threshold || threshold < 0 || threshold > 1) {
+        res.status(500).send('Invalid threshold value')
+        return
+    }
+        
+    bpcs.retrieve({
+        'image': stegoImage,
+        'key': key,
+        'threshold': threshold
+    }).then((buffer) => {
+        console.log(buffer)
+        res.header('Content-Type', 'application/x-binary')
+        res.send(buffer)
+    }).catch(error => {
+        res.status(500).send(error)
+    })
+}
+
+module.exports = {insert, retrieve}

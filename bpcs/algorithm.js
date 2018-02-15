@@ -8,6 +8,9 @@ var pbcToCgc = util.pbcToCgc
 var cgcToPbc = util.cgcToPbc
 var complexity = util.complexity
 var intToArray = util.intToArray
+var arrayToInt = util.arrayToInt
+var generateBitplane = util.generateBitplane
+var putBitplane = util.putBitplane
 
 function insert(spec) {
     console.log(spec)
@@ -49,7 +52,7 @@ function insert(spec) {
 
             if (complexity(matrix) <= threshold) {
                 let mapItem = dataBuffer.readUInt8(4 + Math.floor(i / 8))
-                mapItem |= 1 << (i % 8)
+                mapItem |= (1 << (i % 8))
                 dataBuffer.writeUInt8(mapItem, 4 + Math.floor(i / 8))
             }
         }
@@ -62,27 +65,19 @@ function insert(spec) {
             for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
                 for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
                     // generate bitplane
-                    let bitplane = []
-                    for (let i = 0; i < 8; i++) {
-                        bitplane.push([0,0,0,0,0,0,0,0])
-                        for (let j = 0; j < 8; j++) {
-                            color = imageBuffer.getPixelColor(blockI + i, blockJ + j)
-                            if (color & (1 << bitplaneI))
-                                bitplane[i][j] = 1
-                        }
-                    }
+                    let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
 
                     // convert to cgc, this is optional actually
-                    bitplane = pbcToCgc(bitplane)
+                    // bitplane = pbcToCgc(bitplane)
 
                     // insert message if noisy
                     if (complexity(bitplane) > threshold) {
                         count++
 
                         for (let i = 0; i < 8; i++) {
-                            let mess = dataBuffer.length > messageI ? dataBuffer.readInt8(messageI) : 0
+                            let mess = dataBuffer.length > messageI ? dataBuffer.readUInt8(messageI) : 0
                             for (let j = 0; j < 8; j++)
-                                bitplane[i][j] = mess & (1<<j) ? 1 : 0
+                                bitplane[i][j] = (mess & (1<<j)) ? 1 : 0
                             messageI++
                         }
 
@@ -91,26 +86,82 @@ function insert(spec) {
                     }
 
                     // convert back to pbc, optional
-                    bitplane = cgcToPbc(bitplane)
+                    // bitplane = cgcToPbc(bitplane)
 
                     // flush bitplane to image
-                    for (let i = 0; i < 8; i++) {
-                        for (let j = 0; j < 8; j++) {
-                            color = imageBuffer.getPixelColor(blockI + i, blockJ + j) & ~(1 << bitplaneI)
-                            if (bitplane[i][j])
-                                color |= 1 << bitplaneI
-                                imageBuffer.setPixelColor(color, blockI + i, blockJ + j)
-                        }
-                    }
+                    putBitplane(imageBuffer, blockJ, blockI, bitplaneI, bitplane)
                 }
-        
-        if (count > dataBuffer.length)
+
+        if (count < dataBuffer.length)
             return Promise.reject('image too small')
-        return imageBuffer
-    })
-    .then(() => {
         return imageBuffer
     })
 }
 
-module.exports = {insert}
+function retrieve(spec) {
+    console.log(spec)
+    
+    let image = spec.image
+    let key = spec.key
+    let threshold = spec.threshold ? spec.threshold : 0.5
+
+    let imageBuffer = undefined
+    let width = 0
+    let height = 0
+
+    return jimp.read(image.path).then(img => {
+        // preparing jimp image (convert file to image)
+        imageBuffer = img
+        width = imageBuffer.bitmap.width
+        height = imageBuffer.bitmap.height
+    })
+    .then(() => {
+        let count = 0
+        let plainMessage = []
+
+        for (let blockI = 0; blockI + 8 <= height; blockI += 8)
+            for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
+                for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
+                    // generate bitplane
+                    let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
+
+                    // convert to cgc, this is optional actually
+                    // bitplane = pbcToCgc(bitplane)
+
+                    // retrieve message if noisy
+                    if (complexity(bitplane) > threshold) {
+                        count++
+                        bitplane = conjugate(bitplane)
+                        for (let i = 0; i < 8; i++)
+                            plainMessage.push(arrayToInt(bitplane[i]))
+                    }
+                }
+        
+        let messageBuffer = Buffer.from(plainMessage)
+        let messageSize = messageBuffer.readUInt32BE(0)
+        let payloadOffset = 4 + Math.ceil(messageSize / 64)
+
+        let actualMessage = Buffer.alloc(messageSize, 0)
+        messageBuffer.copy(actualMessage, 0, payloadOffset)
+        for (let i = 0; i < messageSize; i += 8) {
+            let conjugationMap = messageBuffer.readUInt8(4 + Math.floor(i / 8))
+            
+            let messagePlane = []
+            for (let j = 0; j < 8; j++) {
+                let byte = ((i + j) < actualMessage.length) ? actualMessage.readUInt8(i + j) : 0
+                messagePlane.push(intToArray(byte))
+            }
+
+            // if ((conjugationMap >> (i % 8)) & 1) {
+            //     messagePlane = conjugate(messagePlane)
+            //     for (let j = 0; j < 8; j++)
+            //         if ((i + j) < actualMessage.length)
+            //             actualMessage.writeUInt8(arrayToInt(messagePlane[j]), i + j)
+            // }
+        }
+
+        return actualMessage
+    })
+}
+
+module.exports = {insert, retrieve}
