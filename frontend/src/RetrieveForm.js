@@ -28,6 +28,7 @@ class RetrieveForm extends Component {
     let data = new FormData()
     data.append('imageFile', this.imageFileInput.files[0])
     data.append('key', this.keyInput.value)
+    data.append('threshold', this.thresholdInput.value)
 
     fetch('/retrieve', {
       method: 'POST',
@@ -66,6 +67,13 @@ class RetrieveForm extends Component {
             <label className="col-sm-2 col-form-label">Key</label>
             <div className="col-sm-10">
               <input ref={(input) => { this.keyInput = input }} type="text" className="form-control" />
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label">Threshold</label>
+            <div className="col-sm-10">
+              <input ref={(input) => { this.thresholdInput = input }} type="text" className="form-control" value="0.7" />
             </div>
           </div>
 
