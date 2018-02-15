@@ -23,7 +23,7 @@ function conjugate(bitplane) {
     return result
 }
 
-function tooglePbcCgc(bitplane) {
+function pbcToCgc(bitplane) {
     let height = bitplane.length
     if (height <= 0)
         return 0
@@ -31,9 +31,25 @@ function tooglePbcCgc(bitplane) {
 
     let result = []
     for (let i = 0; i < height; i++) {
-        result[i] = [bitplane[i][0]]
+        result.push([bitplane[i][0]])
         for (let j = 1; j < width; j++)
             result[i].push(bitplane[i][j] ^ bitplane[i][j-1])
+    }
+
+    return result
+}
+
+function cgcToPbc(bitplane) {
+    let height = bitplane.length
+    if (height <= 0)
+        return 0
+    let width = bitplane[0].length
+
+    let result = []
+    for (let i = 0; i < height; i++) {
+        result.push([bitplane[i][0]])
+        for (let j = 1; j < width; j++)
+            result[i].push(bitplane[i][j] ^ result[i][j-1])
     }
 
     return result
@@ -69,13 +85,59 @@ module.exports = function(spec) {
     let image = spec.image
     let plainData = spec.data
     let key = spec.key
+    let threshold = 0.3
 
     let width = image.bitmap.width
     let height = image.bitmap.height
 
-    for (let i = 0; i < height; i++)
-        for (let j = 0; j < width; j++)
-            image.setPixelColor(Math.floor(Math.random()*0xffffffff), j, i)
+    let count = 0
+    let messageI = 0
+
+    for (let blockI = 0; blockI + 8 <= height; blockI += 8)
+        for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
+            for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
+                // generate bitplane
+                let bitplane = []
+                for (let i = 0; i < 8; i++) {
+                    bitplane.push([0,0,0,0,0,0,0,0])
+                    for (let j = 0; j < 8; j++) {
+                        color = image.getPixelColor(blockI + i, blockJ + j)
+                        if (color & (1 << bitplaneI))
+                            bitplane[i][j] = 1
+                    }
+                }
+
+                // convert to cgc, this is optional actually
+                bitplane = pbcToCgc(bitplane)
+
+                // // insert message if noisy
+                // if (complexity(bitplane) > threshold) {
+                //     count++
+
+                //     for (let i = 0; i < 8; i++) {
+                //         let mess = plainData.length > messageI ? plainData.readInt8(messageI) : 0
+                //         for (let j = 0; j < 8; j++)
+                //             bitplane[i][j] = mess & (1<<j) ? 1 : 0
+                //         messageI++
+                //     }
+
+                //     if (complexity(bitplane) <= threshold)
+                //         bitplane = conjugate(bitplane)
+                // }
+
+                // convert back to pbc, optional
+                bitplane = cgcToPbc(bitplane)
+
+                // flush bitplane to image
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 8; j++) {
+                        color = image.getPixelColor(blockI + i, blockJ + j) & ~(1 << bitplaneI)
+                        if (bitplane[i][j])
+                            color |= 1 << bitplaneI
+                        image.setPixelColor(color, blockI + i, blockJ + j)
+                    }
+                }
+            }
 
     return image
 }
