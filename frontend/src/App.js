@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Route, Link } from 'react-router-dom'
 import InsertForm from './InsertForm'
 import RetrieveForm from './RetrieveForm'
 
@@ -11,27 +12,27 @@ class App extends Component {
           <div className="col-8">
             <ul className="nav nav-pills nav-fill">
               <li className="nav-item">
-                <a className="nav-link active" href="#">Insert</a>
+                <Link className="nav-link" to="/insert">Insert</Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Retrieve</a>
+                <Link className="nav-link" to="/retrieve">Retrieve</Link>
               </li>
             </ul>
           </div>
           <div className="col" />
           
         </div>
+
         <div className="row" style={{marginTop: 50}}>
           <div className="col" />
           <div className="col-8">
-            <legend>Insert Message</legend>
-            <InsertForm />
-            <hr/>
-            <h1>Retrieve Message</h1>
-            <RetrieveForm />
+            <Route exact path='/' component={InsertForm} />
+            <Route exact path='/insert' component={InsertForm} />
+            <Route exact path='/retrieve' component={RetrieveForm} />
           </div>
           <div className="col" />
         </div>
+
       </div>
     );
   }

@@ -94,13 +94,13 @@ class InsertForm extends Component {
 
         </form>
 
-        <div>
+        <div className="col-sm-6">
           <Image alt="plain-image" src={this.state.currentImage} width={200} height={200} />
         </div>
-        <div>
+        <div className="col-sm-6">
           <Image alt="messaged-image" src={this.state.resultImage} width={200} height={200} />
         </div>
-
+        
       </div>
     );
   }
