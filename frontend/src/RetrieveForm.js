@@ -73,7 +73,7 @@ class RetrieveForm extends Component {
           <div className="form-group row">
             <label className="col-sm-2 col-form-label">Threshold</label>
             <div className="col-sm-10">
-              <input ref={(input) => { this.thresholdInput = input }} type="text" className="form-control" value="0.7" />
+              <input ref={(input) => { this.thresholdInput = input }} type="text" className="form-control" defaultValue="0.7" />
             </div>
           </div>
 
