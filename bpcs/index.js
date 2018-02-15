@@ -1,6 +1,3 @@
-var jimp = require('jimp')
-var bluebird = require('bluebird')
-var fs = bluebird.promisifyAll(require('fs'))
 var bpcs = require('./algorithm')
 
 module.exports = function (req, res, next) {
@@ -31,22 +28,18 @@ module.exports = function (req, res, next) {
     let outputMimeType = req.body.outputType
     if (!outputMimeType)
         outputMimeType = 'image/bmp'
-    if (outputMimeType == 'image/png')
-        outputMimeType = jimp.MIME_PNG
-    else
-        outputMimeType = jimp.MIME_BMP
         
-    jimp.read(stegoImage.path)
-    .then(function(plainFile, key, threshold, img) {
-        return fs.readFileAsync(plainFile.path).then(function (img, key, threshold, data) {
-            return {'image': img, data, key, threshold}
-        }.bind(this, img, key, threshold))
-    }.bind(this, plainFile, key, threshold))
-    .then(bpcs)
-    .then(function(outputMimeType, img) {
+    bpcs({
+        'image': stegoImage,
+        'plainFile': plainFile,
+        'key': key,
+        'threshold': threshold
+    }).then((img) => {
         img.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
             res.send(buffer);
         })
-    }.bind(this, outputMimeType))
+    }).catch(error => {
+        res.status(500).send(error)
+    })
 }
