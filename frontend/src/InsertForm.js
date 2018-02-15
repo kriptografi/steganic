@@ -35,7 +35,7 @@ class InsertForm extends Component {
     data.append('threshold', this.thresholdInput.value)
     data.append('outputType', this.outputTypeInput.value)
 
-    fetch('/stego', {
+    fetch('/stego/insert', {
       method: 'POST',
       body: data
     }).then((resp) => {

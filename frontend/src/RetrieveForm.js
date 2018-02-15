@@ -26,11 +26,11 @@ class RetrieveForm extends Component {
 
   retrieveMessage() {
     let data = new FormData()
-    data.append('imageFile', this.imageFileInput.files[0])
+    data.append('image', this.imageFileInput.files[0])
     data.append('key', this.keyInput.value)
     data.append('threshold', this.thresholdInput.value)
 
-    fetch('/retrieve', {
+    fetch('/stego/retrieve', {
       method: 'POST',
       body: data
     }).then((resp) => {
