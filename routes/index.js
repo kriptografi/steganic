@@ -1,11 +1,9 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+var router = require('../bpcs/route')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-
-router.post('/stego', require('../bpcs/route'))
 
 module.exports = router;
