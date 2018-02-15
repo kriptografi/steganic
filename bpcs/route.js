@@ -1,18 +1,19 @@
-var express = require('express');
+var express = require('express')
 var multer = require('multer')
-var router = express.Router();
+var autoreap = require('multer-autoreap')
+var router = express.Router()
 
 var upload = multer({ dest: 'uploads/' })
 
 var retrieveParam = upload.fields([
     {name: 'image'}
 ])
-router.post('/stego/retrieve', retrieveParam, require('./index').retrieve)
+router.post('/stego/retrieve', retrieveParam, require('./index').retrieve, autoreap)
 
 var insertParam = upload.fields([
     {name: 'image'},
     {name: 'plainFile'}
 ])
-router.post('/stego/insert', insertParam, require('./index').insert)
+router.post('/stego/insert', insertParam, require('./index').insert, autoreap)
 
 module.exports = router;
