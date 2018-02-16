@@ -12,6 +12,29 @@ var arrayToInt = util.arrayToInt
 var generateBitplane = util.generateBitplane
 var putBitplane = util.putBitplane
 
+function status(spec) {
+    let image = spec.image
+    let threshold = spec.threshold
+
+    return jimp.read(image.path).then(img => {
+        let width = img.bitmap.width
+        let height = img.bitmap.height
+
+        for (let blockI = 0; blockI + 8 <= height; blockI += 8)
+            for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
+                for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
+                    let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
+                    if (complexity(bitplane) > threshold)
+                        count++
+                }
+        
+        return {
+            'capacity': count * 8,
+            'messageCapacity': Math.floor(count * 512.0 / 519.0 - 4)
+        }
+    })
+}
+
 function insert(spec) {
     let image = spec.image
     let plainFile = spec.plainFile
@@ -162,4 +185,4 @@ function retrieve(spec) {
     })
 }
 
-module.exports = {insert, retrieve}
+module.exports = {status, insert, retrieve}
