@@ -223,4 +223,4 @@ function vigenereDecrypt(ciphertext, key){
     return plaintext
 }
 
-module.exports = {status, insert, retrieve}
+module.exports = {status, insert, vigenereEncrypt, vigenereDecrypt, retrieve}
