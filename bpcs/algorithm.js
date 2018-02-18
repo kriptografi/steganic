@@ -46,7 +46,7 @@ function insert(spec) {
     let dataBuffer = undefined
     let width = 0
     let height = 0
-
+    
     return jimp.read(image.path).then(img => {
         // preparing jimp image (convert file to image)
         imageBuffer = img
@@ -58,6 +58,8 @@ function insert(spec) {
         return fs.readFileAsync(plainFile.path)
     })
     .then((buffer) => {
+        buffer = vigenereEncrypt(buffer,key)
+
         // allocating message buffer
         // offset 0 : data length
         // offset 4 : conjugation map
@@ -164,6 +166,9 @@ function retrieve(spec) {
 
         let actualMessage = Buffer.alloc(messageSize, 0)
         messageBuffer.copy(actualMessage, 0, payloadOffset)
+        
+        actualMessage = vigenereDecrypt(actualMessage, key)
+        
         // for (let i = 0; i < messageSize; i += 8) {
         //     let conjugationMap = messageBuffer.readUInt8(4 + Math.floor(i / 8))
             
@@ -185,4 +190,37 @@ function retrieve(spec) {
     })
 }
 
-module.exports = {status, insert, retrieve}
+function vigenereEncrypt(plaintext, key){
+    let ciphertext = Buffer.alloc(plaintext.length)
+    let j = 0
+    
+    for(let i = 0; i < plaintext.length; i++){
+        ciphertext[i] = (plaintext[i] + key.charCodeAt(j)) % 256
+        j++
+        j = j % key.length
+    }
+    return ciphertext
+}
+
+function vigenereDecrypt(ciphertext, key){
+    console.log(ciphertext);
+    let plaintext = Buffer.alloc(ciphertext.length)
+    let j = 0
+
+    for(let i = 0; i < ciphertext.length; i++){
+        let x = ciphertext[i] - key.charCodeAt(j)
+        if(x < 0){
+            x = 256 - (key.charCodeAt(j) - ciphertext[i]) % 256
+        }else{
+            x = x % 256
+        }
+
+        plaintext[i] = x
+        j++
+        j = j % key.length
+    }
+    console.log(plaintext)
+    return plaintext
+}
+
+module.exports = {status, insert, vigenereEncrypt, vigenereDecrypt, retrieve}
