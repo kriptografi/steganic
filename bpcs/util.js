@@ -80,4 +80,11 @@ function arrayToInt(array) {
     return num
 }
 
+function generateSeed(key){
+    let seed = 0
+    for (let i = 0; i < key.length; i++)
+        seed += key.charCodeAt(i)
+    return seed
+}
+
 module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt }
