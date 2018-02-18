@@ -50,7 +50,7 @@ class InsertForm extends Component {
       return Promise.reject(resp.error)
     }).then(function (resp) {
       let filename = this.state.currentImageFilename.split(".").slice(0,-1).join(".") + "-stego"
-      
+
       this.setState({
         resultImage: URL.createObjectURL(resp),
         resultImageFilename: filename
