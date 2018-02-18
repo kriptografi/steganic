@@ -28,7 +28,7 @@ function insert(req, res, next) {
     let outputMimeType = req.body.outputType
     if (!outputMimeType)
         outputMimeType = 'image/bmp'
-        
+    
     bpcs.insert({
         'image': stegoImage,
         'plainFile': plainFile,
@@ -62,7 +62,7 @@ function retrieve(req, res, next) {
         res.status(500).send('Invalid threshold value')
         return
     }
-        
+    
     bpcs.retrieve({
         'image': stegoImage,
         'key': key,
@@ -74,6 +74,7 @@ function retrieve(req, res, next) {
     }).catch(error => {
         res.status(500).send(error)
     })
+
 }
 
 module.exports = {insert, retrieve}
