@@ -58,21 +58,31 @@ function insert(spec) {
         return fs.readFileAsync(plainFile.path)
     })
     .then((buffer) => {
-        buffer = vigenereEncrypt(buffer,key)
+        let filename = plainFile.originalname
+        let filenameBuffer = Buffer.alloc(filename.length)
+        for(let i = 0; i < filename.length; i++){
+            filenameBuffer[i] = filename.charCodeAt(i)
+        }
+
+        let msgBuffer = Buffer.alloc(filename.length + buffer.length + 1)
+        filenameBuffer.copy(msgBuffer)
+        buffer.copy(msgBuffer, filenameBuffer.length + 1)
+        msgBuffer = vigenereEncrypt(msgBuffer,key)
 
         // allocating message buffer
         // offset 0 : data length
         // offset 4 : conjugation map
         // rest of offset : actual data
-        dataBuffer = Buffer.alloc(buffer.length + Math.ceil(buffer.length / 64) + 4)
-        dataBuffer.writeInt32BE(buffer.length)
-        buffer.copy(dataBuffer, 4 + Math.ceil(buffer.length / 64))
-
+        dataBuffer = Buffer.alloc(msgBuffer.length + Math.ceil((msgBuffer.length) / 64) + 4)
+        
+        dataBuffer.writeInt32BE(msgBuffer.length)
+        msgBuffer.copy(dataBuffer, 4 + Math.ceil(msgBuffer.length / 64))
+        
         // conjugate data
-        for (let i = 0; i < buffer.length; i += 8) {
+        for (let i = 0; i < msgBuffer.length; i += 8) {
             let matrix = []
             for (let j = 0; j < 8; j++)
-                matrix.push(intToArray(buffer[i*8+j]))
+                matrix.push(intToArray(msgBuffer[i*8+j]))
 
             if (complexity(matrix) <= threshold) {
                 let mapItem = dataBuffer.readUInt8(4 + Math.floor(i / 8))
