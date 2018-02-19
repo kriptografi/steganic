@@ -2,6 +2,7 @@ var jimp = require('jimp')
 var bluebird = require('bluebird')
 var fs = bluebird.promisifyAll(require('fs'))
 var util = require('./util')
+var psnr = require('./psnr')
 
 var conjugate = util.conjugate
 var pbcToCgc = util.pbcToCgc
@@ -11,6 +12,7 @@ var intToArray = util.intToArray
 var arrayToInt = util.arrayToInt
 var generateBitplane = util.generateBitplane
 var putBitplane = util.putBitplane
+var calculatePSNR = psnr.calculate
 
 function status(spec) {
     let image = spec.image
@@ -42,6 +44,7 @@ function insert(spec) {
     let threshold = spec.threshold ? spec.threshold : 0.5
     let usingCgc = spec.usingCgc ? spec.usingCgc : false
 
+    let initialImageBuffer = undefined
     let imageBuffer = undefined
     let dataBuffer = undefined
     let width = 0
@@ -50,6 +53,7 @@ function insert(spec) {
     return jimp.read(image.path).then(img => {
         // preparing jimp image (convert file to image)
         imageBuffer = img
+        initialImageBuffer = imageBuffer
         width = imageBuffer.bitmap.width
         height = imageBuffer.bitmap.height
     })
@@ -116,7 +120,10 @@ function insert(spec) {
 
         if (count < dataBuffer.length)
             return Promise.reject('image too small')
-        return imageBuffer
+
+        let psnr = calculatePSNR(initialImageBuffer, imageBuffer)   
+
+        return {result: imageBuffer, quality: psnr}
     })
 }
 

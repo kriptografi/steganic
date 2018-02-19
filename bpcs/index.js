@@ -35,8 +35,9 @@ function insert(req, res, next) {
         'key': key,
         'threshold': threshold
     }).then((img) => {
-        img.getBuffer(outputMimeType, function(err, buffer) {
+        img.result.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
+            res.set("PSNR", img.quality)
             res.send(buffer);
         })
     }).catch(error => {
