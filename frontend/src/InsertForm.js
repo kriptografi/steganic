@@ -157,8 +157,6 @@ class InsertForm extends Component {
                 { this.state.isProcessing ? 
                   <p><img src="/loader.gif" width="5%"/><br/>Inserting file to image ...</p> : 
                   <a className="waves-effect waves-light btn" onClick={this.insertMessage}>Process</a> }
-                <br/>
-                {!this.state.isProcessing && this.state.statusText ? <p>{this.state.statusText}</p> : null}
             </div>
           </div>
         </div>
@@ -181,6 +179,7 @@ class InsertForm extends Component {
             align="center"
             width="100%"
             height="100%" />
+          {!this.state.isProcessing && this.state.statusText ? <span>{this.state.statusText}</span> : null}
         </div>
         
       </div>
