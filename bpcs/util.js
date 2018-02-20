@@ -111,6 +111,16 @@ RandomNumber.prototype.next = function () {
     return this.lastNum
 };
 
+function randomShuffle(arr, randomizer) {
+    for (let i = 0; i < arr.length; i++) {
+        let pos = randomizer() % (arr.length - i)
+        let temp = arr[i]
+        arr[i] = arr[pos + i]
+        arr[pos + i] = temp
+    }
+    return arr
+}
+
 function copyImage(image) {
     return new jimp(image.bitmap.width, image.bitmap.height, function(err, im) {
         for (let i = 0; i < image.bitmap.height; i++)
@@ -119,4 +129,4 @@ function copyImage(image) {
     })
 }
 
-module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt, copyImage }
+module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt, copyImage, randomShuffle }
