@@ -15,11 +15,11 @@ function insert(req, res, next) {
 
     let key = req.body.key || 'simple_key'
 
-    let threshold = Math.abs(Number(req.body.threshold))
-    if (!threshold)
-        threshold = 0.5
-    if (threshold > 1)
-        threshold = 1.0
+    let threshold = Number(req.body.threshold)
+    if (!threshold || threshold < 0 || threshold > 0.5) {
+        res.status(500).send('Invalid threshold value')
+        return
+    }
 
     let outputMimeType = req.body.outputType
     if (!outputMimeType)
@@ -30,8 +30,9 @@ function insert(req, res, next) {
         'plainFile': plainFile,
         'key': key,
         'threshold': threshold,
-        'usingEncryption': req.body.usingEncryption,
-        'usingRandomBlock': req.body.usingRandomBlock
+        'usingCgc': req.body.usingCgc == 'true',
+        'usingEncryption': req.body.usingEncryption == 'true',
+        'usingRandomBlock': req.body.usingRandomBlock == 'true'
     }).then((img) => {
         img.result.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
@@ -54,7 +55,7 @@ function retrieve(req, res, next) {
     let key = req.body.key || 'simple_key'
 
     let threshold = Number(req.body.threshold)
-    if (!threshold || threshold < 0 || threshold > 1) {
+    if (!threshold || threshold < 0 || threshold > 0.5) {
         res.status(500).send('Invalid threshold value')
         return
     }
@@ -63,8 +64,9 @@ function retrieve(req, res, next) {
         'image': stegoImage,
         'key': key,
         'threshold': threshold,
-        'usingDecryption': req.body.usingDecryption,
-        'usingRandomBlock': req.body.usingRandomBlock
+        'usingCgc': req.body.usingCgc == 'true',
+        'usingDecryption': req.body.usingDecryption == 'true',
+        'usingRandomBlock': req.body.usingRandomBlock == 'true'
     }).then((buffer) => {
         res.header('Content-Type', 'application/x-binary')
         res.header('X-Steganic-Filename', buffer.filename)

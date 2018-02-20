@@ -62,6 +62,11 @@ function insert(spec) {
         height = imageBuffer.bitmap.height
     })
     .then(() => {
+        if (threshold > 0.5)
+            return Promise.reject("threshold value should between 0 and 0.5")
+        return Promise.resolve()
+    })
+    .then(() => {
         // read message file
         return fs.readFileAsync(plainFile.path)
     })
@@ -101,7 +106,7 @@ function insert(spec) {
                     if (complexity(bitplane) > threshold) {
                         count++
 
-                        bitplaneI[0] = intToArray(0xff, 8)
+                        bitplane[0] = intToArray(0xff, 8)
                         for (let i = 1; i < 8; i++) {
                             let mess = dataBuffer.length > messageI ? dataBuffer.readUInt8(messageI) : 0
                             for (let j = 0; j < 8; j++)
@@ -148,6 +153,11 @@ function retrieve(spec) {
         height = imageBuffer.bitmap.height
     })
     .then(() => {
+        if (threshold > 0.5)
+            return Promise.reject("threshold value should between 0 and 0.5")
+        return Promise.resolve()
+    })
+    .then(() => {
         let plainMessage = []
 
         if (usingCgc)
@@ -180,9 +190,9 @@ function retrieve(spec) {
         let filenameSize = 0
         for(filenameSize = 0; filenameSize < 256 && filenameSize < buffer.length; filenameSize++) {
             let byte = buffer.readUInt8(filenameSize)
-            if (byte == 0) {
+            if (byte == 0)
                 break
-            } else
+            else
                 filename += String.fromCharCode(byte)
         }
 
