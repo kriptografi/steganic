@@ -75,6 +75,23 @@ class InsertForm extends Component {
   render() {
     return (
       <div>
+        
+        {/* Form section */}
+        <div className="col s12 m8">
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Message</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.plainFileInput = input }} type="file"/>
+            </div>
+          </div>
+        </div>
+
+        {/* Preview section */}
+        <div className="col s12 m4">
+
+        </div>
 
         <div>
           <div className="form-group row">

@@ -11,20 +11,15 @@ class App extends Component {
           <Link className="waves-effect waves-light btn-flat grey white-text" style={{marginRight:3}}to="/insert">Insert</Link>
           <Link className="waves-effect waves-light btn-flat grey white-text" to="/retrieve">Retrieve</Link>
         </div>
-        <div className="row">
-          <div className="col" />
-          <div className="col-8">
-            <ul className="nav nav-pills nav-fill">
-              <li className="nav-item">
-                <Link className="nav-link" to="/insert">Insert</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/retrieve">Retrieve</Link>
-              </li>
-            </ul>
+
+        <div class="container grey lighten-5">
+          <br/>
+          <br/>
+          <div class="row">
+            <Route exact path='/' component={InsertForm} />
+            <Route exact path='/insert' component={InsertForm} />
+            <Route exact path='/retrieve' component={RetrieveForm} />
           </div>
-          <div className="col" />
-          
         </div>
 
         <div className="row" style={{marginTop: 50}}>
