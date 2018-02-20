@@ -34,18 +34,19 @@ class RetrieveForm extends Component {
     data.append('threshold', this.thresholdInput.value)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
 
+    let filename = ''
     fetch('/stego/retrieve', {
       method: 'POST',
       body: data
     }).then((resp) => {
+      filename = resp.headers.get('X-Steganic-Filename')
       return resp.blob()
     }).then((resp) => {
       var a = document.createElement('a')
       a.href = window.URL.createObjectURL(resp)
-      a.download = "filename"
+      a.download = filename
       a.click()
     }).catch((error) => {
-      console.log(error)
       new Noty({
         text: (error || 'Cannot retrieve message'),
         type: 'error',
