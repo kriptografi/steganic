@@ -40,6 +40,8 @@ class InsertForm extends Component {
     data.append('threshold', this.thresholdInput.value)
     data.append('outputType', this.outputTypeInput.value)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
+    data.append('usingEncrption', this.usingEncyrptionInput ? true : false)
+    data.append('usingRandom', this.usingRandomInput ? true : false)
 
     fetch('/stego/insert', {
       method: 'POST',
@@ -86,91 +88,79 @@ class InsertForm extends Component {
               <input ref={(input) => { this.plainFileInput = input }} type="file"/>
             </div>
           </div>
-        </div>
-
-        {/* Preview section */}
-        <div className="col s12 m4">
-
-        </div>
-
-        <div>
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Message</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.plainFileInput = input }} type="file" className="form-control-plaintext" />
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Image</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input onChange={this.onImageChange} ref={(input) => { this.imageFileInput = input }} type="file"/>
             </div>
           </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Image</label>
-            <div className="col-sm-10">
-              <input onChange={this.onImageChange} ref={(input) => { this.imageFileInput = input }} type="file" className="form-control-plaintext" />
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Key</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.keyInput = input }} type="text"/>
             </div>
           </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Key</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.keyInput = input }} type="text" className="form-control" />
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Key</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.7"/>
             </div>
           </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Threshold</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.thresholdInput = input }} type="text" className="form-control" defaultValue="0.7" />
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Output Type</b>
             </div>
-          </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Output Type</label>
-            <div className="col-sm-10">
-              <select ref={(input) => { this.outputTypeInput = input }} className="form-control">
+            <div className="input-field col s10 m8 input-field">
+              <select ref={(input) => { this.outputTypeInput = input }}>
                 <option value="image/png">PNG</option>
                 <option value="image/bmp">BMP</option>
               </select>
             </div>
           </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <div className="form-check">
-                <label className="form-check-label">
-                  <input ref={(input) => {this.usingCgcInput = input}} className="form-check-input" type="checkbox" /> Use CGC System
-                </label>
-              </div>
+          <div className="row">
+            <div className="col s10 m9 offset-m3 offset-s2">
+              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.usingEncyrptionInput = input}}/>
+              <label htmlFor="using-encryption">Encrypt message first</label>
+              <br/>
+              <input id="using-cgc" type="checkbox" className="filled-in" ref={(input) => {this.usingCgcInput = input}}/>
+              <label htmlFor="using-cgc">Use CGC system</label>
+              <br/>
+              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.usingRandomInput = input}}/>
+              <label htmlFor="using-random">Input message randomly</label>
             </div>
           </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <button onClick={this.insertMessage} className="btn btn-primary">Insert</button>
+          <br/>
+          <div className="row center">
+            <div className="col s12 m11 offset-m1">
+                <a className="waves-effect waves-light btn" onClick={this.insertMessage}>Process</a>
             </div>
           </div>
-
         </div>
 
-        <div className="row">
-            <div className="col-sm-6">
-                <Image
-                  filename={this.state.currentImageFilename}
-                  alt="plain-image"
-                  src={this.state.currentImage}
-                  align="center" 
-                  width="100%"
-                  height="100%" />
-            </div>
-            <div className="col-sm-6">
-                <Image
-                  filename={this.state.resultImageFilename}
-                  alt="messaged-image"
-                  src={this.state.resultImage}
-                  align="center"
-                  width="100%"
-                  height="100%" />
-            </div>
+        {/* Preview section */}
+        <div className="col s12 m3">
+          <span>Before</span>
+          <Image
+            filename={this.state.currentImageFilename}
+            alt="plain-image"
+            src={this.state.currentImage}
+            align="center" 
+            width="100%"
+            height="100%" />
+          <span>After</span>
+          <Image
+            filename={this.state.resultImageFilename}
+            alt="messaged-image"
+            src={this.state.resultImage}
+            align="center"
+            width="100%"
+            height="100%" />
         </div>
         
       </div>

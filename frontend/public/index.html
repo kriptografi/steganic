@@ -33,8 +33,8 @@
   </head>
   <body>
     <div class="container center light-blue darken-3 white-text" style="padding:0.7em">
-      <h1>Steganic</h1>
-      <p>Hide your file within image using BPCS method</p>
+      <h3 style="margin-bottom:0">Steganic</h3>
+      <p style="margin-top:0">Hide your file within image using BPCS method</p>
     </div>
     <noscript>
       <div class="center">You need to enable JavaScript to run this app.</div>
@@ -42,83 +42,6 @@
     
     <div id="root"></div>
 
-    <div class="container grey lighten-5">
-      <br>
-      <br>
-      <div class="row">
-        <div class="col s12 m8">
-          <div class="row">
-            <div class="col s2 m2 offset-m1">
-              <br><b>Message</b>
-            </div>
-            <div class="col s10 m8 input-field">
-              <input id="email" type="file" class="validate">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s2 m2 offset-m1">
-              <br><b>Image</b>
-            </div>
-            <div class="col s10 m8 input-field">
-              <input id="email" type="file" class="validate">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s2 m2 offset-m1">
-              <br><b>Key</b>
-            </div>
-            <div class="col s10 m8 input-field">
-              <input id="email" type="text" class="validate">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s2 m2 offset-m1">
-              <br><b>Threshold</b>
-            </div>
-            <div class="col s10 m8 input-field">
-              <input id="email" type="text">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s2 m2 offset-m1">
-              <br><b>Output Type</b>
-            </div>
-            <div class="input-field col s10 m8 input-field">
-              <select>
-                <option value="image/png">PNG</option>
-                <option value="image/bmp">BMP</option>
-              </select>
-            </div>
-          </div>
-          <div class="row">
-              <div class="col s10 m9 offset-m3 offset-s2">
-                <input type="checkbox" class="filled-in" id="filled-in-box"/>
-                <label for="filled-in-box">Encrypt message first</label>
-                <br>
-                <input type="checkbox" class="filled-in" id="filled-in-box"/>
-                <label for="filled-in-box">Use CGC system</label>
-                <br>
-                <input type="checkbox" class="filled-in" id="filled-in-box"/>
-                <label for="filled-in-box">Input message sequentially</label>
-              </div>
-          </div>
-          <br>
-          <div class="row center">
-            <div class="col s12 m11 offset-m1">
-                <a class="waves-effect waves-light btn">Process</a>
-            </div>
-          </div>
-        </div>
-        <div class="col s12 m3">
-          Before
-          <img src="unknown.png" height="250em" width="100%">
-          After
-          <img src="unknown.png" height="250em" width="100%">
-        </div>
-      </div>
-      <br>
-      <br>
-    </div>
     <script>
       $(document).ready(function() {
         $('select').material_select();
