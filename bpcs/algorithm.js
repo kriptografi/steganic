@@ -13,6 +13,7 @@ var intToArray = util.intToArray
 var arrayToInt = util.arrayToInt
 var generateBitplane = util.generateBitplane
 var putBitplane = util.putBitplane
+var copyImage = util.copyImage
 var calculatePSNR = psnr.calculate
 
 function status(spec) {
@@ -54,7 +55,7 @@ function insert(spec) {
     return jimp.read(image.path).then(img => {
         // preparing jimp image (convert file to image)
         imageBuffer = img
-        initialImageBuffer = imageBuffer
+        initialImageBuffer = copyImage(imageBuffer)
         width = imageBuffer.bitmap.width
         height = imageBuffer.bitmap.height
     })
