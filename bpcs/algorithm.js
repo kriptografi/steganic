@@ -14,6 +14,7 @@ var arrayToInt = util.arrayToInt
 var generateBitplane = util.generateBitplane
 var putBitplane = util.putBitplane
 var copyImage = util.copyImage
+var randomShuffle = util.randomShuffle
 var calculatePSNR = psnr.calculate
 
 function status(spec) {
@@ -90,43 +91,55 @@ function insert(spec) {
         return dataBuffer
     })
     .then(dataBuffer => {
-        let count = 0
-        let messageI = 0
-        
         if (usingCgc)
             pbcToCgc(imageBuffer)
 
+        noisyBitplanes = []
         for (let blockI = 0; blockI + 8 <= height; blockI += 8)
             for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
                 for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
                     // generate bitplane
                     let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
 
-                    // insert message if noisy
-                    if (complexity(bitplane) > threshold) {
-                        count++
-
-                        bitplane[0] = intToArray(0xff, 8)
-                        for (let i = 1; i < 8; i++) {
-                            let mess = dataBuffer.length > messageI ? dataBuffer.readUInt8(messageI) : 0
-                            for (let j = 0; j < 8; j++)
-                                bitplane[i][j] = (mess & (1<<j)) ? 1 : 0
-                            messageI++
-                        }
-
-                        if (complexity(bitplane) <= threshold)
-                            bitplane = conjugate(bitplane)
-                    }
-
-                    // flush bitplane to image
-                    putBitplane(imageBuffer, blockJ, blockI, bitplaneI, bitplane)
+                    if (complexity(bitplane) > threshold)
+                        noisyBitplanes.push({
+                            offsetX: blockJ,
+                            offsetY: blockI,
+                            offsetZ: bitplaneI,
+                            bitplane
+                        })
                 }
+
+        if (usingRandom)
+            randomShuffle(noisyBitplanes)
+
+        if (noisyBitplanes.length*7 < dataBuffer.length)
+            return Promise.reject('image too small')
+
+        let messageI = 0
+        for (let i = 0; messageI < dataBuffer.length; i++) {
+            let bitplane = noisyBitplanes[i].bitplane
+            bitplane[0] = intToArray(0xff, 8)
+            
+            for (let j = 1; j < 8; j++) {
+                let mess = dataBuffer.length > messageI ? dataBuffer.readUInt8(messageI) : 0
+                for (let k = 0; k < 8; k++)
+                    bitplane[j][k] = (mess & (1<<k)) ? 1 : 0
+                messageI++
+            }
+
+            if (complexity(bitplane) <= threshold)
+                bitplane = conjugate(bitplane)
+
+            putBitplane(imageBuffer,
+                noisyBitplanes[i].offsetX,
+                noisyBitplanes[i].offsetY,
+                noisyBitplanes[i].offsetZ,
+                bitplane)
+        }
 
         if (usingCgc)
             cgcToPbc(imageBuffer)
-
-        if (count < dataBuffer.length)
-            return Promise.reject('image too small')
 
         let psnr = calculatePSNR(initialImageBuffer, imageBuffer)   
 
@@ -163,20 +176,25 @@ function retrieve(spec) {
         if (usingCgc)
             pbcToCgc(imageBuffer)
 
+        let noisyBitplanes = []
         for (let blockI = 0; blockI + 8 <= height; blockI += 8)
             for (let blockJ = 0; blockJ + 8 <= width; blockJ += 8)
                 for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
-                    // generate bitplane
                     let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
-
-                    // retrieve message if noisy
-                    if (complexity(bitplane) > threshold) {
-                        if (arrayToInt(bitplane[0]) != 0xff)
-                            bitplane = conjugate(bitplane)
-                        for (let i = 1; i < 8; i++)
-                            plainMessage.push(arrayToInt(bitplane[i]))
-                    }
+                    if (complexity(bitplane) > threshold)
+                        noisyBitplanes.push(bitplane)
                 }
+
+        if (usingRandom)
+            randomShuffle(noisyBitplanes)
+
+        for (let i = 0; i < noisyBitplanes.length; i++) {
+            let bitplane = noisyBitplanes[i]
+            if (arrayToInt(bitplane[0]) != 0xff)
+                bitplane = conjugate(bitplane)
+            for (let j = 1; j < 8; j++)
+                plainMessage.push(arrayToInt(bitplane[j]))
+        }
         
         let messageBuffer = Buffer.from(plainMessage)
         let messageSize = messageBuffer.readUInt32BE(0)
