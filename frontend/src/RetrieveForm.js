@@ -114,59 +114,6 @@ class RetrieveForm extends Component {
             height="100%" />
         </div>
 
-        {/* <form>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Image</label>
-            <div className="col-sm-10">
-              <input
-                ref={(input) => { this.imageFileInput = input }}
-                onChange={this.onImageChange}
-                type="file"
-                className="form-control-plaintext" />
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Key</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.keyInput = input }} type="text" className="form-control" />
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Threshold</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.thresholdInput = input }} type="text" className="form-control" defaultValue="0.7" />
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <div className="form-check">
-                <label className="form-check-label">
-                  <input ref={(input) => {this.usingCgcInput = input}} className="form-check-input" type="checkbox" /> Use CGC System
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <button onClick={this.retrieveMessage} className="btn btn-primary">Retrieve</button>
-            </div>
-          </div>
-
-        </form>
-
-        <div className="row">
-          <div className="col-sm-12">
-            <Image alt="plain-image" align="center" src={this.state.currentImage} width="100%" height="100%" />
-          </div>
-        </div> */}
-
       </div>
     );
   }

@@ -20,16 +20,6 @@ class App extends Component {
           </div>
         </div>
 
-        {/* <div className="row" style={{marginTop: 50}}>
-          <div className="col" />
-          <div className="col-8">
-            <Route exact path='/' component={InsertForm} />
-            <Route exact path='/insert' component={InsertForm} />
-            <Route exact path='/retrieve' component={RetrieveForm} />
-          </div>
-          <div className="col" />
-        </div> */}
-
       </div>
     );
   }
