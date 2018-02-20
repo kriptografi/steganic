@@ -1,3 +1,5 @@
+var jimp = require('jimp')
+
 function generateBitplane(image, x, y, bitplane) {
     result = []
     for (let i = 0; i < 8; i++) {
@@ -98,4 +100,12 @@ RandomNumber.prototype.next = function () {
     return this.seedNum
 };
 
-module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt }
+function copyImage(image) {
+    return new jimp(image.bitmap.width, image.bitmap.height, function(err, im) {
+        for (let i = 0; i < image.bitmap.height; i++)
+            for (let j = 0; j < image.bitmap.width; j++)
+                im.setPixelColor(image.getPixelColor(j,i), j, i)
+    })
+}
+
+module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt, copyImage }

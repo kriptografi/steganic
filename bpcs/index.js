@@ -35,11 +35,13 @@ function insert(req, res, next) {
         'key': key,
         'threshold': threshold
     }).then((img) => {
-        img.getBuffer(outputMimeType, function(err, buffer) {
+        img.result.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
+            res.set("X-Steganic-PSNR", img.quality)
             res.send(buffer);
         })
     }).catch(error => {
+        console.log(error)
         res.status(500).send(error)
     })
 }
@@ -72,7 +74,6 @@ function retrieve(req, res, next) {
         res.header('X-Steganic-Filename', buffer.filename)
         res.send(buffer.message)
     }).catch(error => {
-        console.log(error)
         res.status(500).send(error)
     })
 }

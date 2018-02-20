@@ -11,7 +11,8 @@ class InsertForm extends Component {
       currentImage: null,
       resultImage: null,
       currentImageFilename: null,
-      resultImageFilename: null
+      resultImageFilename: null,
+      imageQuality: null
     }
 
     this.onImageChange = this.onImageChange.bind(this)
@@ -45,8 +46,11 @@ class InsertForm extends Component {
       method: 'POST',
       body: data
     }).then((resp) => {
-      if (resp.status === 200)
+      if (resp.status === 200) {
+        if (resp.headers.get('X-Steganic-PSNR'))
+          this.setState({imageQuality: resp.headers.get('X-Steganic-PSNR')})
         return resp.blob()
+      }
       return Promise.reject(resp.error)
     }).then(function (resp) {
       let filename = this.state.currentImageFilename.split(".").slice(0,-1).join(".") + "-stego"
@@ -155,6 +159,21 @@ class InsertForm extends Component {
                   height="100%" />
             </div>
         </div>
+
+        {
+          (() => {
+            if (this.state.imageQuality)
+              return (
+                <div className="row">
+                  <div className="col-sm-12">
+                    <div className="alert alert-primary" role="alert">
+                      Image quality based on PSNR value is {this.state.imageQuality.toFixed(2)} dB
+                    </div>
+                  </div>
+                </div>
+              )
+          }).apply(this)
+        }
         
       </div>
     );
