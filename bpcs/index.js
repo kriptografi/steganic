@@ -13,11 +13,7 @@ function insert(req, res, next) {
         return
     }
 
-    let key = req.body.key
-    if (!key) {
-        res.status(500).send('Must specify key')
-        return
-    }
+    let key = req.body.key || 'simple_key'
 
     let threshold = Math.abs(Number(req.body.threshold))
     if (!threshold)
@@ -55,11 +51,7 @@ function retrieve(req, res, next) {
         return
     }
 
-    let key = req.body.key
-    if (!key) {
-        res.status(500).send('Must specify key')
-        return
-    }
+    let key = req.body.key || 'simple_key'
 
     let threshold = Number(req.body.threshold)
     if (!threshold || threshold < 0 || threshold > 1) {
