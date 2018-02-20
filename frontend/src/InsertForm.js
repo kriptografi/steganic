@@ -55,7 +55,9 @@ class InsertForm extends Component {
     }).then((resp) => {
       if (resp.status === 200) {
         if (resp.headers.get('X-Steganic-PSNR'))
-          this.setState({imageQuality: resp.headers.get('X-Steganic-PSNR')})
+          try {
+            this.setState({imageQuality: parseFloat(resp.headers.get('X-Steganic-PSNR'))})
+          } catch(e) {}
         return resp.blob()
       }
       return Promise.reject(resp.error)
@@ -197,7 +199,7 @@ class InsertForm extends Component {
 
         {
           (() => {
-            if (this.state.imageQuality)
+            if (this.state.imageQuality && typeof this.state.imageQuality === 'number')
               return (
                 <div className="row">
                   <div className="col-sm-12">
@@ -211,7 +213,7 @@ class InsertForm extends Component {
         }
         
       </div>
-    );
+    )
   }
 }
 
