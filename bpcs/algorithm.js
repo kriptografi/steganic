@@ -60,28 +60,13 @@ function insert(spec) {
     .then((buffer) => {
         buffer = vigenereEncrypt(buffer,key)
 
-        // allocating message buffer
-        // offset 0 : data length
-        // offset 4 : conjugation map
-        // rest of offset : actual data
-        dataBuffer = Buffer.alloc(buffer.length + Math.ceil(buffer.length / 64) + 4)
+        dataBuffer = Buffer.alloc(buffer.length + 4, 0)
         dataBuffer.writeInt32BE(buffer.length)
-        buffer.copy(dataBuffer, 4 + Math.ceil(buffer.length / 64))
+        buffer.copy(dataBuffer, 4)
 
-        // conjugate data
-        for (let i = 0; i < buffer.length; i += 8) {
-            let matrix = []
-            for (let j = 0; j < 8; j++)
-                matrix.push(intToArray(buffer[i*8+j]))
-
-            if (complexity(matrix) <= threshold) {
-                let mapItem = dataBuffer.readUInt8(4 + Math.floor(i / 8))
-                mapItem |= (1 << (i % 8))
-                dataBuffer.writeUInt8(mapItem, 4 + Math.floor(i / 8))
-            }
-        }
+        return dataBuffer
     })
-    .then(() => {
+    .then(dataBuffer => {
         let count = 0
         let messageI = 0
         
@@ -98,7 +83,8 @@ function insert(spec) {
                     if (complexity(bitplane) > threshold) {
                         count++
 
-                        for (let i = 0; i < 8; i++) {
+                        bitplaneI[0] = intToArray(0xff, 8)
+                        for (let i = 1; i < 8; i++) {
                             let mess = dataBuffer.length > messageI ? dataBuffer.readUInt8(messageI) : 0
                             for (let j = 0; j < 8; j++)
                                 bitplane[i][j] = (mess & (1<<j)) ? 1 : 0
@@ -139,7 +125,6 @@ function retrieve(spec) {
         height = imageBuffer.bitmap.height
     })
     .then(() => {
-        let count = 0
         let plainMessage = []
 
         if (usingCgc)
@@ -153,40 +138,20 @@ function retrieve(spec) {
 
                     // retrieve message if noisy
                     if (complexity(bitplane) > threshold) {
-                        count++
-                        bitplane = conjugate(bitplane)
-                        for (let i = 0; i < 8; i++)
+                        if (arrayToInt(bitplane[0]) != 0xff)
+                            bitplane = conjugate(bitplane)
+                        for (let i = 1; i < 8; i++)
                             plainMessage.push(arrayToInt(bitplane[i]))
                     }
                 }
         
         let messageBuffer = Buffer.from(plainMessage)
         let messageSize = messageBuffer.readUInt32BE(0)
-        let payloadOffset = 4 + Math.ceil(messageSize / 64)
-
         let actualMessage = Buffer.alloc(messageSize, 0)
-        messageBuffer.copy(actualMessage, 0, payloadOffset)
-        
-        actualMessage = vigenereDecrypt(actualMessage, key)
-        
-        // for (let i = 0; i < messageSize; i += 8) {
-        //     let conjugationMap = messageBuffer.readUInt8(4 + Math.floor(i / 8))
-            
-        //     let messagePlane = []
-        //     for (let j = 0; j < 8; j++) {
-        //         let byte = ((i + j) < actualMessage.length) ? actualMessage.readUInt8(i + j) : 0
-        //         messagePlane.push(intToArray(byte))
-        //     }
 
-        //     if ((conjugationMap >> (i % 8)) & 1) {
-        //         messagePlane = conjugate(messagePlane)
-        //         for (let j = 0; j < 8; j++)
-        //             if ((i + j) < actualMessage.length)
-        //                 actualMessage.writeUInt8(arrayToInt(messagePlane[j]), i + j)
-        //     }
-        // }
+        messageBuffer.copy(actualMessage, 0, 4)
 
-        return actualMessage
+        return vigenereDecrypt(actualMessage, key)
     })
 }
 
@@ -203,7 +168,6 @@ function vigenereEncrypt(plaintext, key){
 }
 
 function vigenereDecrypt(ciphertext, key){
-    console.log(ciphertext);
     let plaintext = Buffer.alloc(ciphertext.length)
     let j = 0
 
@@ -219,7 +183,7 @@ function vigenereDecrypt(ciphertext, key){
         j++
         j = j % key.length
     }
-    console.log(plaintext)
+    
     return plaintext
 }
 
