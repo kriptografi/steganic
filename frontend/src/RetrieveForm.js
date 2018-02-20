@@ -39,7 +39,7 @@ class RetrieveForm extends Component {
     data.append('threshold', this.thresholdInput.value)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
     data.append('usingRandomBlock', this.randomBlockInput.checked ? true : false)
-    data.append('usingDecrypt', this.decryptInput.checked ? true : false)
+    data.append('usingDecryption', this.decryptInput.checked ? true : false)
 
     let filename = ''
     fetch('/stego/retrieve', {
