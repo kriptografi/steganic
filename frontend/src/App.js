@@ -6,31 +6,18 @@ import RetrieveForm from './RetrieveForm'
 class App extends Component {
   render() {
     return (
-      <div className="container" style={{marginTop: 20}}>
-        <div className="row">
-          <div className="col" />
-          <div className="col-8">
-            <ul className="nav nav-pills nav-fill">
-              <li className="nav-item">
-                <Link className="nav-link" to="/insert">Insert</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/retrieve">Retrieve</Link>
-              </li>
-            </ul>
-          </div>
-          <div className="col" />
-          
+      <div>
+        <div className="container center grey darken-2" style={{padding:10}}>
+          <Link className="waves-effect waves-light btn-flat grey white-text" style={{marginRight:3}}to="/insert">Insert</Link>
+          <Link className="waves-effect waves-light btn-flat grey white-text" to="/retrieve">Retrieve</Link>
         </div>
 
-        <div className="row" style={{marginTop: 50}}>
-          <div className="col" />
-          <div className="col-8">
+        <div class="container grey lighten-5">
+          <div class="row" style={{padding: 50}}>
             <Route exact path='/' component={InsertForm} />
             <Route exact path='/insert' component={InsertForm} />
             <Route exact path='/retrieve' component={RetrieveForm} />
           </div>
-          <div className="col" />
         </div>
 
       </div>

@@ -3,6 +3,8 @@ import 'noty/lib/noty.css'
 import 'noty/lib/themes/nest.css'
 import Noty from 'noty'
 import Image from './Image'
+import ReactMaterialSelect from 'react-material-select'
+import 'react-material-select/lib/css/reactMaterialSelect.css'
 
 class InsertForm extends Component {
   constructor(props) {
@@ -12,6 +14,8 @@ class InsertForm extends Component {
       resultImage: null,
       currentImageFilename: null,
       resultImageFilename: null,
+      isProcessing: false,
+      statusText: null,
       imageQuality: null
     }
 
@@ -39,12 +43,22 @@ class InsertForm extends Component {
   }
 
   insertMessage() {
+    if (this.state.isProcessing)
+      return
+
+    this.setState({
+      resultImage: null,
+      statusText: null,
+      isProcessing: true
+    })
+
     let data = new FormData()
+    this.outputTypeInput = this.refs.outputselect.getValue()
     data.append('plainFile', this.plainFileInput.files[0])
     data.append('image', this.imageFileInput.files[0])
     data.append('key', this.keyInput.value)
     data.append('threshold', this.thresholdInput.value)
-    data.append('outputType', this.outputTypeInput.value)
+    data.append('outputType', this.outputTypeInput)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
     data.append('usingRandomBlock', this.randomBlockInput.checked ? true : false)
     data.append('usingEncryption', this.encryptInput.checked ? true : false)
@@ -53,6 +67,7 @@ class InsertForm extends Component {
       method: 'POST',
       body: data
     }).then((resp) => {
+      this.setState({isProcessing: false})
       if (resp.status === 200) {
         if (resp.headers.get('X-Steganic-PSNR'))
           try {
@@ -63,10 +78,15 @@ class InsertForm extends Component {
       return Promise.reject(resp.error)
     }).then(function (resp) {
       let filename = this.state.currentImageFilename.split(".").slice(0,-1).join(".") + "-stego"
+      let psnrText = ""
+      if (this.state.imageQuality && typeof this.state.imageQuality === 'number')
+        psnrText = "Image quality based on PSNR value is " + this.state.imageQuality.toFixed(2) +" dB"
 
       this.setState({
         resultImage: URL.createObjectURL(resp),
-        resultImageFilename: filename
+        resultImageFilename: filename,
+        statusText: "Finish inserting message to " 
+                  + filename + ". " + psnrText
       })
 
       new Noty({
@@ -88,129 +108,94 @@ class InsertForm extends Component {
   render() {
     return (
       <div>
-
-        <div>
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Message</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.plainFileInput = input }} type="file" className="form-control-plaintext" />
+        
+        {/* Form section */}
+        <div className="col s12 m8">
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Message</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.plainFileInput = input }} type="file"/>
             </div>
           </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Image</label>
-            <div className="col-sm-10">
-              <input onChange={this.onImageChange} ref={(input) => { this.imageFileInput = input }} type="file" className="form-control-plaintext" />
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Image</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input onChange={this.onImageChange} ref={(input) => { this.imageFileInput = input }} type="file"/>
             </div>
           </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Key</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.keyInput = input }} type="text" disabled className="form-control" />
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Key</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.keyInput = input }} type="text" disabled/>
             </div>
           </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Threshold</label>
-            <div className="col-sm-10">
-              <input ref={(input) => { this.thresholdInput = input }} type="text" className="form-control" defaultValue="0.3" />
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Threshold</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.3"/>
             </div>
           </div>
-
-          <div className="form-group row">
-            <label className="col-sm-2 col-form-label">Output Type</label>
-            <div className="col-sm-10">
-              <select ref={(input) => { this.outputTypeInput = input }} className="form-control">
-                <option value="image/png">PNG</option>
-                <option value="image/bmp">BMP</option>
-              </select>
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Output Type</b>
+            </div>
+            <div className="input-field col s10 m8 input-field" style={{marginTop:-15}}>
+              <ReactMaterialSelect defaultValue="image/png" ref="outputselect" resetLabel={false}>
+                <option dataValue="image/png">PNG</option>
+                <option dataValue="image/bmp">BMP</option>
+              </ReactMaterialSelect>
             </div>
           </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <div className="form-check">
-                <label className="form-check-label">
-                  <input ref={(input) => {this.usingCgcInput = input}} className="form-check-input" type="checkbox" /> Use CGC System
-                </label>
-              </div>
+          <div className="row">
+            <div className="col s10 m9 offset-m3 offset-s2">
+              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.encryptInput = input}} onChange={this.updateKeyUI}/>
+              <label htmlFor="using-encryption">Encrypt message first</label>
+              <br/>
+              <input id="using-cgc" type="checkbox" className="filled-in" ref={(input) => {this.usingCgcInput = input}}/>
+              <label htmlFor="using-cgc">Use CGC system</label>
+              <br/>
+              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.randomBlockInput = input}} onChange={this.updateKeyUI}/>
+              <label htmlFor="using-random">Input message randomly</label>
             </div>
           </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <div className="form-check">
-                <label className="form-check-label">
-                  <input ref={(input) => {this.randomBlockInput = input}}
-                    onChange={this.updateKeyUI}
-                    className="form-check-input"
-                    type="checkbox" /> Use random blocks
-                </label>
-              </div>
+          <br/>
+          <div className="row center">
+            <div className="col s12 m11 offset-m1">
+                { this.state.isProcessing ? 
+                  <p><img src="/loader.gif" width="5%"/><br/>Inserting file to image ...</p> : 
+                  <a className="waves-effect waves-light btn" onClick={this.insertMessage}>Process</a> }
             </div>
           </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <div className="form-check">
-                <label className="form-check-label">
-                  <input ref={(input) => {this.encryptInput = input}}
-                    onChange={this.updateKeyUI}
-                    className="form-check-input"
-                    type="checkbox" /> Encrypt message
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <button onClick={this.insertMessage} className="btn btn-primary">Insert</button>
-            </div>
-          </div>
-
         </div>
 
-        <div className="row">
-            <div className="col-sm-6">
-                <Image
-                  filename={this.state.currentImageFilename}
-                  alt="plain-image"
-                  src={this.state.currentImage}
-                  align="center" 
-                  width="100%"
-                  height="100%" />
-            </div>
-            <div className="col-sm-6">
-                <Image
-                  filename={this.state.resultImageFilename}
-                  alt="messaged-image"
-                  src={this.state.resultImage}
-                  align="center"
-                  width="100%"
-                  height="100%" />
-            </div>
+        {/* Preview section */}
+        <div className="col s12 m3">
+          <span>Before</span>
+          <Image
+            filename={this.state.currentImageFilename}
+            alt="plain-image"
+            src={this.state.currentImage}
+            align="center" 
+            width="100%"
+            height="100%" />
+          <span>After</span>
+          <Image
+            filename={this.state.resultImageFilename}
+            alt="messaged-image"
+            src={this.state.resultImage}
+            align="center"
+            width="100%"
+            height="100%" />
+          {!this.state.isProcessing && this.state.statusText ? <span>{this.state.statusText}</span> : null}
         </div>
-
-        {
-          (() => {
-            if (this.state.imageQuality && typeof this.state.imageQuality === 'number')
-              return (
-                <div className="row">
-                  <div className="col-sm-12">
-                    <div className="alert alert-primary" role="alert">
-                      Image quality based on PSNR value is {this.state.imageQuality.toFixed(2)} dB
-                    </div>
-                  </div>
-                </div>
-              )
-          }).apply(this)
-        }
         
       </div>
     )
