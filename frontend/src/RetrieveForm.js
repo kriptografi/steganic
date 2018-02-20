@@ -107,13 +107,13 @@ class RetrieveForm extends Component {
           </div>
           <div className="row">
             <div className="col s10 m9 offset-m3 offset-s2">
-              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.decryptInput = input}}/>
+              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.decryptInput = input}} onChange={this.updateKeyUI}/>
               <label htmlFor="using-encryption">Decrypt message</label>
               <br/>
               <input id="using-cgc" type="checkbox" className="filled-in" ref={(input) => {this.usingCgcInput = input}}/>
               <label htmlFor="using-cgc">Use CGC system</label>
               <br/>
-              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.randomBlockInput = input}}/>
+              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.randomBlockInput = input}} onChange={this.updateKeyUI}/>
               <label htmlFor="using-random">Input message randomly</label>
             </div>
           </div>
