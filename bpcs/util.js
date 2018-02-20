@@ -1,3 +1,5 @@
+var jimp = require('jimp')
+
 function generateBitplane(image, x, y, bitplane) {
     result = []
     for (let i = 0; i < 8; i++) {
@@ -80,4 +82,53 @@ function arrayToInt(array) {
     return num
 }
 
-module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt }
+function generateSeed(key){
+    let seed = 0
+    for (let i = 0; i < key.length; i++)
+        seed = seed*7 + key.charCodeAt(i)
+    return seed
+}
+
+function RandomNumber(seed) {
+    this.seedNum = seed % 2147483647
+    if (this.seedNum <= 0) 
+        this.seedNum += 2147483646
+    
+    this.lastNum = 15
+    this.seedA = 0
+    this.seedB = 0
+    for (let i = 0; i < 32; i++)
+        if (this.seedNum & (1 << i)) {
+            if (i % 2 == 0)
+                this.seedA |= 1 << Math.floor(i / 2)
+            else
+                this.seedB |= 1 << Math.floor(i / 2)
+        }
+
+    this.next = function() {
+        this.lastNum = Math.round(Math.abs((this.lastNum * this.seedA + this.seedB) % 2147483647))
+        return this.lastNum
+    }.bind(this)
+}
+
+function randomShuffle(arr, randomizer) {
+    for (let i = 0; i < arr.length; i++) {
+        let pos = randomizer() % (arr.length - i)
+        if (pos > 0) {
+            let temp = arr[i]
+            arr[i] = arr[pos + i]
+            arr[pos + i] = temp
+        }
+    }
+    return arr
+}
+
+function copyImage(image) {
+    return new jimp(image.bitmap.width, image.bitmap.height, function(err, im) {
+        for (let i = 0; i < image.bitmap.height; i++)
+            for (let j = 0; j < image.bitmap.width; j++)
+                im.setPixelColor(image.getPixelColor(j,i), j, i)
+    })
+}
+
+module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt, copyImage, generateSeed, randomShuffle, RandomNumber }

@@ -15,11 +15,13 @@ class InsertForm extends Component {
       currentImageFilename: null,
       resultImageFilename: null,
       isProcessing: false,
-      statusText: null
+      statusText: null,
+      imageQuality: null
     }
 
     this.onImageChange = this.onImageChange.bind(this)
     this.insertMessage = this.insertMessage.bind(this)
+    this.updateKeyUI = this.updateKeyUI.bind(this)
   }
   
   onImageChange(e) {
@@ -34,6 +36,10 @@ class InsertForm extends Component {
       this.setState({currentImageFilename: this.imageFileInput.files[0].name})
       reader.readAsDataURL(this.imageFileInput.files[0]);
     }
+  }
+
+  updateKeyUI() {
+    this.keyInput.disabled = !this.randomBlockInput.checked && !this.encryptInput.checked
   }
 
   insertMessage() {
@@ -54,24 +60,33 @@ class InsertForm extends Component {
     data.append('threshold', this.thresholdInput.value)
     data.append('outputType', this.outputTypeInput)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
-    data.append('usingEncrption', this.usingEncyrptionInput ? true : false)
-    data.append('usingRandom', this.usingRandomInput ? true : false)
+    data.append('usingRandomBlock', this.randomBlockInput.checked ? true : false)
+    data.append('usingEncryption', this.encryptInput.checked ? true : false)
 
     fetch('/stego/insert', {
       method: 'POST',
       body: data
     }).then((resp) => {
       this.setState({isProcessing: false})
-      if (resp.status === 200)
+      if (resp.status === 200) {
+        if (resp.headers.get('X-Steganic-PSNR'))
+          try {
+            this.setState({imageQuality: parseFloat(resp.headers.get('X-Steganic-PSNR'))})
+          } catch(e) {}
         return resp.blob()
+      }
       return Promise.reject(resp.error)
     }).then(function (resp) {
       let filename = this.state.currentImageFilename.split(".").slice(0,-1).join(".") + "-stego"
+      let psnrText = ""
+      if (this.state.imageQuality && typeof this.state.imageQuality === 'number')
+        psnrText = "Image quality based on PSNR value is " + this.state.imageQuality.toFixed(2) +" dB"
 
       this.setState({
         resultImage: URL.createObjectURL(resp),
         resultImageFilename: filename,
-        statusText: "Finish inserting message to " + filename
+        statusText: "Finish inserting message to " 
+                  + filename + ". " + psnrText
       })
 
       new Noty({
@@ -117,7 +132,7 @@ class InsertForm extends Component {
               <br/><b>Key</b>
             </div>
             <div className="col s10 m8 input-field">
-              <input ref={(input) => { this.keyInput = input }} type="text"/>
+              <input ref={(input) => { this.keyInput = input }} type="text" disabled/>
             </div>
           </div>
           <div className="row">
@@ -125,7 +140,7 @@ class InsertForm extends Component {
               <br/><b>Threshold</b>
             </div>
             <div className="col s10 m8 input-field">
-              <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.7"/>
+              <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.3"/>
             </div>
           </div>
           <div className="row">
@@ -141,13 +156,13 @@ class InsertForm extends Component {
           </div>
           <div className="row">
             <div className="col s10 m9 offset-m3 offset-s2">
-              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.usingEncyrptionInput = input}}/>
+              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.encryptInput = input}} onChange={this.updateKeyUI}/>
               <label htmlFor="using-encryption">Encrypt message first</label>
               <br/>
               <input id="using-cgc" type="checkbox" className="filled-in" ref={(input) => {this.usingCgcInput = input}}/>
               <label htmlFor="using-cgc">Use CGC system</label>
               <br/>
-              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.usingRandomInput = input}}/>
+              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.randomBlockInput = input}} onChange={this.updateKeyUI}/>
               <label htmlFor="using-random">Input message randomly</label>
             </div>
           </div>
@@ -183,7 +198,7 @@ class InsertForm extends Component {
         </div>
         
       </div>
-    );
+    )
   }
 }
 

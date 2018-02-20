@@ -13,17 +13,13 @@ function insert(req, res, next) {
         return
     }
 
-    let key = req.body.key
-    if (!key) {
-        res.status(500).send('Must specify key')
+    let key = req.body.key || 'simple_key'
+
+    let threshold = Number(req.body.threshold)
+    if (!threshold || threshold < 0 || threshold > 0.5) {
+        res.status(500).send('Invalid threshold value')
         return
     }
-
-    let threshold = Math.abs(Number(req.body.threshold))
-    if (!threshold)
-        threshold = 0.5
-    if (threshold > 1)
-        threshold = 1.0
 
     let outputMimeType = req.body.outputType
     if (!outputMimeType)
@@ -33,13 +29,18 @@ function insert(req, res, next) {
         'image': stegoImage,
         'plainFile': plainFile,
         'key': key,
-        'threshold': threshold
+        'threshold': threshold,
+        'usingCgc': req.body.usingCgc == 'true',
+        'usingEncryption': req.body.usingEncryption == 'true',
+        'usingRandomBlock': req.body.usingRandomBlock == 'true'
     }).then((img) => {
-        img.getBuffer(outputMimeType, function(err, buffer) {
+        img.result.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
+            res.set("X-Steganic-PSNR", img.quality)
             res.send(buffer);
         })
     }).catch(error => {
+        console.log(error)
         res.status(500).send(error)
     })
 }
@@ -51,14 +52,10 @@ function retrieve(req, res, next) {
         return
     }
 
-    let key = req.body.key
-    if (!key) {
-        res.status(500).send('Must specify key')
-        return
-    }
+    let key = req.body.key || 'simple_key'
 
     let threshold = Number(req.body.threshold)
-    if (!threshold || threshold < 0 || threshold > 1) {
+    if (!threshold || threshold < 0 || threshold > 0.5) {
         res.status(500).send('Invalid threshold value')
         return
     }
@@ -66,12 +63,16 @@ function retrieve(req, res, next) {
     bpcs.retrieve({
         'image': stegoImage,
         'key': key,
-        'threshold': threshold
+        'threshold': threshold,
+        'usingCgc': req.body.usingCgc == 'true',
+        'usingDecryption': req.body.usingDecryption == 'true',
+        'usingRandomBlock': req.body.usingRandomBlock == 'true'
     }).then((buffer) => {
-        console.log(buffer)
         res.header('Content-Type', 'application/x-binary')
-        res.send(buffer)
+        res.header('X-Steganic-Filename', buffer.filename)
+        res.send(buffer.message)
     }).catch(error => {
+        console.log(error)
         res.status(500).send(error)
     })
 }

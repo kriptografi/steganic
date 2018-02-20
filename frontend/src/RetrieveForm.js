@@ -14,6 +14,7 @@ class RetrieveForm extends Component {
 
     this.onImageChange = this.onImageChange.bind(this)
     this.retrieveMessage = this.retrieveMessage.bind(this)
+    this.updateKeyUI = this.updateKeyUI.bind(this)
   }
 
   onImageChange() {
@@ -30,6 +31,10 @@ class RetrieveForm extends Component {
     }
   }
 
+  updateKeyUI() {
+    this.keyInput.disabled = !this.randomBlockInput.checked && !this.decryptInput.checked
+  }
+
   retrieveMessage() {
     if (this.state.isProcessing)
       return
@@ -43,7 +48,10 @@ class RetrieveForm extends Component {
     data.append('key', this.keyInput.value)
     data.append('threshold', this.thresholdInput.value)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
+    data.append('usingRandomBlock', this.randomBlockInput.checked ? true : false)
+    data.append('usingDecryption', this.decryptInput.checked ? true : false)
 
+    let filename = ''
     fetch('/stego/retrieve', {
       method: 'POST',
       body: data
@@ -51,14 +59,14 @@ class RetrieveForm extends Component {
       this.setState({
         isProcessing: false
       })
+      filename = resp.headers.get('X-Steganic-Filename')
       return resp.blob()
     }).then((resp) => {
       var a = document.createElement('a')
       a.href = window.URL.createObjectURL(resp)
-      a.download = "filename"
+      a.download = filename
       a.click()
     }).catch((error) => {
-      console.log(error)
       new Noty({
         text: (error || 'Cannot retrieve message'),
         type: 'error',
@@ -86,7 +94,7 @@ class RetrieveForm extends Component {
               <br/><b>Key</b>
             </div>
             <div className="col s10 m8 input-field">
-              <input ref={(input) => { this.keyInput = input }} type="text"/>
+              <input ref={(input) => { this.keyInput = input }} type="text" disabled/>
             </div>
           </div>
           <div className="row">
@@ -94,18 +102,18 @@ class RetrieveForm extends Component {
               <br/><b>Threshold</b>
             </div>
             <div className="col s10 m8 input-field">
-              <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.7"/>
+              <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.3"/>
             </div>
           </div>
           <div className="row">
             <div className="col s10 m9 offset-m3 offset-s2">
-              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.usingEncyrptionInput = input}}/>
-              <label htmlFor="using-encryption">Encrypt message first</label>
+              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.decryptInput = input}}/>
+              <label htmlFor="using-encryption">Decrypt message</label>
               <br/>
               <input id="using-cgc" type="checkbox" className="filled-in" ref={(input) => {this.usingCgcInput = input}}/>
               <label htmlFor="using-cgc">Use CGC system</label>
               <br/>
-              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.usingRandomInput = input}}/>
+              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.randomBlockInput = input}}/>
               <label htmlFor="using-random">Input message randomly</label>
             </div>
           </div>
