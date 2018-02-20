@@ -6,7 +6,11 @@ import RetrieveForm from './RetrieveForm'
 class App extends Component {
   render() {
     return (
-      <div className="container" style={{marginTop: 20}}>
+      <div>
+        <div className="container center grey darken-2" style={{padding:10}}>
+          <Link className="waves-effect waves-light btn-flat grey white-text" style={{marginRight:3}}to="/insert">Insert</Link>
+          <Link className="waves-effect waves-light btn-flat grey white-text" to="/retrieve">Retrieve</Link>
+        </div>
         <div className="row">
           <div className="col" />
           <div className="col-8">

@@ -10,11 +10,16 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -27,19 +32,102 @@
     <title>Steganic</title>
   </head>
   <body>
+    <div class="container center light-blue darken-3 white-text" style="padding:0.7em">
+      <h1>Steganic</h1>
+      <p>Hide your file within image using BPCS method</p>
+    </div>
     <noscript>
-      You need to enable JavaScript to run this app.
+      <div class="center">You need to enable JavaScript to run this app.</div>
     </noscript>
+    
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    <div class="container center grey darken-2" style="padding:0.7em">
+      <a class="waves-effect waves-light btn-flat grey darken-1 white-text">Insert</a>
+      <a class="waves-effect waves-light btn-flat grey white-text">Retrieve</a>
+    </div>
+    <div class="container grey lighten-5">
+      <br>
+      <br>
+      <div class="row">
+        <div class="col s12 m8">
+          <div class="row">
+            <div class="col s2 m2 offset-m1">
+              <br><b>Message</b>
+            </div>
+            <div class="col s10 m8 input-field">
+              <input id="email" type="file" class="validate">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s2 m2 offset-m1">
+              <br><b>Image</b>
+            </div>
+            <div class="col s10 m8 input-field">
+              <input id="email" type="file" class="validate">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s2 m2 offset-m1">
+              <br><b>Key</b>
+            </div>
+            <div class="col s10 m8 input-field">
+              <input id="email" type="text" class="validate">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s2 m2 offset-m1">
+              <br><b>Threshold</b>
+            </div>
+            <div class="col s10 m8 input-field">
+              <input id="email" type="text">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s2 m2 offset-m1">
+              <br><b>Output Type</b>
+            </div>
+            <div class="input-field col s10 m8 input-field">
+              <select>
+                <option value="image/png">PNG</option>
+                <option value="image/bmp">BMP</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+              <div class="col s10 m9 offset-m3 offset-s2">
+                <input type="checkbox" class="filled-in" id="filled-in-box"/>
+                <label for="filled-in-box">Encrypt message first</label>
+                <br>
+                <input type="checkbox" class="filled-in" id="filled-in-box"/>
+                <label for="filled-in-box">Use CGC system</label>
+                <br>
+                <input type="checkbox" class="filled-in" id="filled-in-box"/>
+                <label for="filled-in-box">Input message sequentially</label>
+              </div>
+          </div>
+          <br>
+          <div class="row center">
+            <div class="col s12 m11 offset-m1">
+                <a class="waves-effect waves-light btn">Process</a>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m3">
+          Before
+          <img src="unknown.png" height="250em" width="100%">
+          After
+          <img src="unknown.png" height="250em" width="100%">
+        </div>
+      </div>
+      <br>
+      <br>
+    </div>
+    <script>
+      $(document).ready(function() {
+        $('select').material_select();
+      });
+    </script>
   </body>
 </html>
+      
