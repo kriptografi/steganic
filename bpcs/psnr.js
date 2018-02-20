@@ -47,7 +47,7 @@ function calculate(image1, image2) {
 
     let mse = (mseRed + mseGreen + mseBlue + mseAlpha) / 4
 
-    return 20*Math.log10(255) - 10*Math.log1p(mse)
+    return 20*Math.log10(255) - 10*Math.log10(mse)
 }
 
 module.exports = {calculate}
