@@ -57,7 +57,16 @@ function insert(spec) {
         // read message file
         return fs.readFileAsync(plainFile.path)
     })
-    .then((buffer) => {
+    .then(buffer => {
+        let filename = plainFile.originalname
+        let dataBuffer = Buffer.alloc(buffer.length + filename.length + 1)
+        buffer.copy(dataBuffer, filename.length + 1)
+        dataBuffer.write(filename)
+        dataBuffer.writeUInt8(0, filename.length)
+
+        return dataBuffer
+    })
+    .then(buffer => {
         buffer = vigenereEncrypt(buffer,key)
 
         dataBuffer = Buffer.alloc(buffer.length + 4, 0)
@@ -152,6 +161,21 @@ function retrieve(spec) {
         messageBuffer.copy(actualMessage, 0, 4)
 
         return vigenereDecrypt(actualMessage, key)
+    }).then(buffer => {
+        let filename = ''
+        let filenameSize = 0
+        for(filenameSize = 0; filenameSize < 256 && filenameSize < buffer.length; filenameSize++) {
+            let byte = buffer.readUInt8(filenameSize)
+            if (byte == 0) {
+                break
+            } else
+                filename += String.fromCharCode(byte)
+        }
+
+        return {
+            filename,
+            message: buffer.slice(filenameSize + 1)
+        }
     })
 }
 
@@ -183,7 +207,7 @@ function vigenereDecrypt(ciphertext, key){
         j++
         j = j % key.length
     }
-    
+
     return plaintext
 }
 

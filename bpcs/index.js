@@ -68,10 +68,11 @@ function retrieve(req, res, next) {
         'key': key,
         'threshold': threshold
     }).then((buffer) => {
-        console.log(buffer)
         res.header('Content-Type', 'application/x-binary')
-        res.send(buffer)
+        res.header('X-Steganic-Filename', buffer.filename)
+        res.send(buffer.message)
     }).catch(error => {
+        console.log(error)
         res.status(500).send(error)
     })
 }
