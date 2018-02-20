@@ -7,7 +7,10 @@ import Image from './Image'
 class RetrieveForm extends Component {
   constructor(props) {
     super(props)
-    this.state = {currentImage: null}
+    this.state = {
+      currentImage: null,
+      isProcessing: false
+    }
 
     this.onImageChange = this.onImageChange.bind(this)
     this.retrieveMessage = this.retrieveMessage.bind(this)
@@ -28,6 +31,13 @@ class RetrieveForm extends Component {
   }
 
   retrieveMessage() {
+    if (this.state.isProcessing)
+      return
+
+    this.setState({
+      isProcessing: true
+    })
+
     let data = new FormData()
     data.append('image', this.imageFileInput.files[0])
     data.append('key', this.keyInput.value)
@@ -38,6 +48,9 @@ class RetrieveForm extends Component {
       method: 'POST',
       body: data
     }).then((resp) => {
+      this.setState({
+        isProcessing: false
+      })
       return resp.blob()
     }).then((resp) => {
       var a = document.createElement('a')
@@ -99,7 +112,9 @@ class RetrieveForm extends Component {
           <br/>
           <div className="row center">
             <div className="col s12 m11 offset-m1">
-                <a className="waves-effect waves-light btn" onClick={this.retrieveMessage}>Retrieve</a>
+                { this.state.isProcessing ? 
+                  <p><img src="/loader.gif" width="5%"/><br/>Retrieving file from image ...</p> : 
+                  <a className="waves-effect waves-light btn" onClick={this.retrieveMessage}>Retrieve</a> }
             </div>
           </div>
         </div>
