@@ -33,7 +33,9 @@ function insert(req, res, next) {
         'image': stegoImage,
         'plainFile': plainFile,
         'key': key,
-        'threshold': threshold
+        'threshold': threshold,
+        'usingEncryption': req.body.usingEncryption,
+        'usingRandomBlock': req.body.usingRandomBlock
     }).then((img) => {
         img.result.getBuffer(outputMimeType, function(err, buffer) {
             res.set("Content-Type", outputMimeType);
@@ -68,7 +70,9 @@ function retrieve(req, res, next) {
     bpcs.retrieve({
         'image': stegoImage,
         'key': key,
-        'threshold': threshold
+        'threshold': threshold,
+        'usingDecryption': req.body.usingDecryption,
+        'usingRandomBlock': req.body.usingRandomBlock
     }).then((buffer) => {
         res.header('Content-Type', 'application/x-binary')
         res.header('X-Steganic-Filename', buffer.filename)

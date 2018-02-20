@@ -45,6 +45,8 @@ function insert(spec) {
     let key = spec.key
     let threshold = spec.threshold ? spec.threshold : 0.5
     let usingCgc = spec.usingCgc ? spec.usingCgc : false
+    let usingEncrypt = spec.usingEncryption ? spec.usingEncryption : false
+    let usingRandom = spec.usingRandomBlock ? spec.usingRandomBlock : false
 
     let initialImageBuffer = undefined
     let imageBuffer = undefined
@@ -73,7 +75,8 @@ function insert(spec) {
         return dataBuffer
     })
     .then(buffer => {
-        buffer = cipher.vigenereEncrypt(buffer,key)
+        if (usingEncrypt)
+            buffer = cipher.vigenereEncrypt(buffer,key)
 
         dataBuffer = Buffer.alloc(buffer.length + 4, 0)
         dataBuffer.writeInt32BE(buffer.length)
@@ -131,6 +134,8 @@ function retrieve(spec) {
     let key = spec.key
     let threshold = spec.threshold ? spec.threshold : 0.5
     let usingCgc = spec.usingCgc ? spec.usingCgc : false
+    let usingDecrypt = spec.usingDecryption ? spec.usingDecryption : false
+    let usingRandom = spec.usingRandomBlock ? spec.usingRandomBlock : false
 
     let imageBuffer = undefined
     let width = 0
@@ -169,7 +174,7 @@ function retrieve(spec) {
 
         messageBuffer.copy(actualMessage, 0, 4)
 
-        return cipher.vigenereDecrypt(actualMessage, key)
+        return usingDecrypt ? cipher.vigenereDecrypt(actualMessage, key) : actualMessage
     }).then(buffer => {
         let filename = ''
         let filenameSize = 0
