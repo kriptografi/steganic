@@ -57,9 +57,64 @@ class RetrieveForm extends Component {
 
   render() {
     return (
-      <div style={{marginBottom: 50}}>
+      <div>
 
-        <form>
+        <div className="col s12 m8">
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Image</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.imageFileInput = input }} type="file" onChange={this.onImageChange}/>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Key</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.keyInput = input }} type="text"/>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col s2 m2 offset-m1">
+              <br/><b>Threshold</b>
+            </div>
+            <div className="col s10 m8 input-field">
+              <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.7"/>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col s10 m9 offset-m3 offset-s2">
+              <input id="using-encryption" type="checkbox" className="filled-in" ref={(input) => {this.usingEncyrptionInput = input}}/>
+              <label htmlFor="using-encryption">Encrypt message first</label>
+              <br/>
+              <input id="using-cgc" type="checkbox" className="filled-in" ref={(input) => {this.usingCgcInput = input}}/>
+              <label htmlFor="using-cgc">Use CGC system</label>
+              <br/>
+              <input id="using-random" type="checkbox" className="filled-in" ref={(input) => {this.usingRandomInput = input}}/>
+              <label htmlFor="using-random">Input message randomly</label>
+            </div>
+          </div>
+          <br/>
+          <div className="row center">
+            <div className="col s12 m11 offset-m1">
+                <a className="waves-effect waves-light btn" onClick={this.retrieveMessage}>Retrieve</a>
+            </div>
+          </div>
+        </div>
+
+        {/* Preview section */}
+        <div className="col s12 m3">
+          <Image 
+            alt="plain-image" 
+            align="center" 
+            src={this.state.currentImage} 
+            width="100%" 
+            height="100%" />
+        </div>
+
+        {/* <form>
 
           <div className="form-group row">
             <label className="col-sm-2 col-form-label">Image</label>
@@ -110,7 +165,7 @@ class RetrieveForm extends Component {
           <div className="col-sm-12">
             <Image alt="plain-image" align="center" src={this.state.currentImage} width="100%" height="100%" />
           </div>
-        </div>
+        </div> */}
 
       </div>
     );
