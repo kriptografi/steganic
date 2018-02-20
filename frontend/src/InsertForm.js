@@ -13,7 +13,9 @@ class InsertForm extends Component {
       currentImage: null,
       resultImage: null,
       currentImageFilename: null,
-      resultImageFilename: null
+      resultImageFilename: null,
+      isProcessing: false,
+      statusText: null
     }
 
     this.onImageChange = this.onImageChange.bind(this)
@@ -35,6 +37,15 @@ class InsertForm extends Component {
   }
 
   insertMessage() {
+    if (this.state.isProcessing)
+      return
+
+    this.setState({
+      resultImage: null,
+      statusText: null,
+      isProcessing: true
+    })
+
     let data = new FormData()
     this.outputTypeInput = this.refs.outputselect.getValue()
     data.append('plainFile', this.plainFileInput.files[0])
@@ -50,6 +61,7 @@ class InsertForm extends Component {
       method: 'POST',
       body: data
     }).then((resp) => {
+      this.setState({isProcessing: false})
       if (resp.status === 200)
         return resp.blob()
       return Promise.reject(resp.error)
@@ -58,7 +70,8 @@ class InsertForm extends Component {
 
       this.setState({
         resultImage: URL.createObjectURL(resp),
-        resultImageFilename: filename
+        resultImageFilename: filename,
+        statusText: "Finish inserting message to " + filename
       })
 
       new Noty({
@@ -141,7 +154,11 @@ class InsertForm extends Component {
           <br/>
           <div className="row center">
             <div className="col s12 m11 offset-m1">
-                <a className="waves-effect waves-light btn" onClick={this.insertMessage}>Process</a>
+                { this.state.isProcessing ? 
+                  <p><img src="/loader.gif" width="5%"/><br/>Inserting file to image ...</p> : 
+                  <a className="waves-effect waves-light btn" onClick={this.insertMessage}>Process</a> }
+                <br/>
+                {!this.state.isProcessing && this.state.statusText ? <p>{this.state.statusText}</p> : null}
             </div>
           </div>
         </div>
