@@ -3,6 +3,8 @@ import 'noty/lib/noty.css'
 import 'noty/lib/themes/nest.css'
 import Noty from 'noty'
 import Image from './Image'
+import ReactMaterialSelect from 'react-material-select'
+import 'react-material-select/lib/css/reactMaterialSelect.css'
 
 class InsertForm extends Component {
   constructor(props) {
@@ -34,11 +36,12 @@ class InsertForm extends Component {
 
   insertMessage() {
     let data = new FormData()
+    this.outputTypeInput = this.refs.outputselect.getValue()
     data.append('plainFile', this.plainFileInput.files[0])
     data.append('image', this.imageFileInput.files[0])
     data.append('key', this.keyInput.value)
     data.append('threshold', this.thresholdInput.value)
-    data.append('outputType', this.outputTypeInput.value)
+    data.append('outputType', this.outputTypeInput)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
     data.append('usingEncrption', this.usingEncyrptionInput ? true : false)
     data.append('usingRandom', this.usingRandomInput ? true : false)
@@ -106,7 +109,7 @@ class InsertForm extends Component {
           </div>
           <div className="row">
             <div className="col s2 m2 offset-m1">
-              <br/><b>Key</b>
+              <br/><b>Threshold</b>
             </div>
             <div className="col s10 m8 input-field">
               <input ref={(input) => { this.thresholdInput = input }} type="text" defaultValue="0.7"/>
@@ -116,11 +119,11 @@ class InsertForm extends Component {
             <div className="col s2 m2 offset-m1">
               <br/><b>Output Type</b>
             </div>
-            <div className="input-field col s10 m8 input-field">
-              <select ref={(input) => { this.outputTypeInput = input }}>
-                <option value="image/png">PNG</option>
-                <option value="image/bmp">BMP</option>
-              </select>
+            <div className="input-field col s10 m8 input-field" style={{marginTop:-15}}>
+              <ReactMaterialSelect defaultValue="image/png" ref="outputselect" resetLabel={false}>
+                <option dataValue="image/png">PNG</option>
+                <option dataValue="image/bmp">BMP</option>
+              </ReactMaterialSelect>
             </div>
           </div>
           <div className="row">
