@@ -90,14 +90,25 @@ function generateSeed(key){
 }
 
 function RandomNumber(seed) {
-    this.seedNum = seed % 2147483647;
+    this.seedNum = seed % 2147483647
     if (this.seedNum <= 0) 
-        this.seedNum += 2147483646;
+        this.seedNum += 2147483646
+    
+    this.lastNum = 15
+    this.seedA = 0
+    this.seedB = 0
+    for (let i = 0; i < 32; i++)
+        if (this.seedNum & (1 << i)) {
+            if (i % 2 == 0)
+                this.seedA |= 1 << Math.floor(i / 2)
+            else
+                this.seedB |= 1 << Math.floor(i / 2)
+        }
 }
   
 RandomNumber.prototype.next = function () {
-    this.seedNum = this.seedNum * 16807 % 2147483647;
-    return this.seedNum
+    this.lastNum = Math.floor(Math.abs((this.lastNum * this.seedA + this.seedB) % 2147483647))
+    return this.lastNum
 };
 
 function copyImage(image) {
