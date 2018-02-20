@@ -31,7 +31,7 @@ function status(spec) {
         
         return {
             'capacity': count * 8,
-            'messageCapacity': Math.floor(count * 512.0 / 519.0 - 4)
+            'messageCapacity': Math.floor(8 * count - 4 - 4/7)*7/8
         }
     })
 }
