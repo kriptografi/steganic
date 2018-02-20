@@ -17,6 +17,7 @@ class InsertForm extends Component {
 
     this.onImageChange = this.onImageChange.bind(this)
     this.insertMessage = this.insertMessage.bind(this)
+    this.updateKeyUI = this.updateKeyUI.bind(this)
   }
   
   onImageChange(e) {
@@ -33,6 +34,10 @@ class InsertForm extends Component {
     }
   }
 
+  updateKeyUI() {
+    this.keyInput.disabled = !this.randomBlockInput.checked && !this.encryptInput.checked
+  }
+
   insertMessage() {
     let data = new FormData()
     data.append('plainFile', this.plainFileInput.files[0])
@@ -41,6 +46,8 @@ class InsertForm extends Component {
     data.append('threshold', this.thresholdInput.value)
     data.append('outputType', this.outputTypeInput.value)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
+    data.append('usingRandomBlock', this.randomBlockInput.checked ? true : false)
+    data.append('usingEncryption', this.encryptInput.checked ? true : false)
 
     fetch('/stego/insert', {
       method: 'POST',
@@ -98,7 +105,7 @@ class InsertForm extends Component {
           <div className="form-group row">
             <label className="col-sm-2 col-form-label">Key</label>
             <div className="col-sm-10">
-              <input ref={(input) => { this.keyInput = input }} type="text" className="form-control" />
+              <input ref={(input) => { this.keyInput = input }} type="text" disabled className="form-control" />
             </div>
           </div>
 
@@ -125,6 +132,34 @@ class InsertForm extends Component {
               <div className="form-check">
                 <label className="form-check-label">
                   <input ref={(input) => {this.usingCgcInput = input}} className="form-check-input" type="checkbox" /> Use CGC System
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <div className="col-sm-2" />
+            <div className="col-sm-10">
+              <div className="form-check">
+                <label className="form-check-label">
+                  <input ref={(input) => {this.randomBlockInput = input}}
+                    onChange={this.updateKeyUI}
+                    className="form-check-input"
+                    type="checkbox" /> Use random blocks
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <div className="col-sm-2" />
+            <div className="col-sm-10">
+              <div className="form-check">
+                <label className="form-check-label">
+                  <input ref={(input) => {this.encryptInput = input}}
+                    onChange={this.updateKeyUI}
+                    className="form-check-input"
+                    type="checkbox" /> Encrypt message
                 </label>
               </div>
             </div>

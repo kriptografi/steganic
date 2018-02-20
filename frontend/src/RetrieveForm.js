@@ -11,6 +11,7 @@ class RetrieveForm extends Component {
 
     this.onImageChange = this.onImageChange.bind(this)
     this.retrieveMessage = this.retrieveMessage.bind(this)
+    this.updateKeyUI = this.updateKeyUI.bind(this)
   }
 
   onImageChange() {
@@ -27,12 +28,18 @@ class RetrieveForm extends Component {
     }
   }
 
+  updateKeyUI() {
+    this.keyInput.disabled = !this.randomBlockInput.checked && !this.decryptInput.checked
+  }
+
   retrieveMessage() {
     let data = new FormData()
     data.append('image', this.imageFileInput.files[0])
     data.append('key', this.keyInput.value)
     data.append('threshold', this.thresholdInput.value)
     data.append('usingCgc', this.usingCgcInput.checked ? true : false)
+    data.append('usingRandomBlock', this.randomBlockInput.checked ? true : false)
+    data.append('usingDecrypt', this.decryptInput.checked ? true : false)
 
     let filename = ''
     fetch('/stego/retrieve', {
@@ -76,7 +83,10 @@ class RetrieveForm extends Component {
           <div className="form-group row">
             <label className="col-sm-2 col-form-label">Key</label>
             <div className="col-sm-10">
-              <input ref={(input) => { this.keyInput = input }} type="text" className="form-control" />
+              <input ref={(input) => { this.keyInput = input }}
+                type="text"
+                disabled
+                className="form-control" />
             </div>
           </div>
 
@@ -93,6 +103,35 @@ class RetrieveForm extends Component {
               <div className="form-check">
                 <label className="form-check-label">
                   <input ref={(input) => {this.usingCgcInput = input}} className="form-check-input" type="checkbox" /> Use CGC System
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <div className="col-sm-2" />
+            <div className="col-sm-10">
+              <div className="form-check">
+                <label className="form-check-label">
+                  <input
+                    ref={(input) => {this.randomBlockInput = input}}
+                    onChange={this.updateKeyUI}
+                    className="form-check-input"
+                    type="checkbox" /> Using random blocks
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <div className="col-sm-2" />
+            <div className="col-sm-10">
+              <div className="form-check">
+                <label className="form-check-label">
+                  <input ref={(input) => {this.decryptInput = input}}
+                    onChange={this.updateKeyUI}
+                    className="form-check-input"
+                    type="checkbox" /> Decrypt message
                 </label>
               </div>
             </div>
