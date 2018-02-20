@@ -15,6 +15,8 @@ var generateBitplane = util.generateBitplane
 var putBitplane = util.putBitplane
 var copyImage = util.copyImage
 var randomShuffle = util.randomShuffle
+var generateSeed = util.generateSeed
+var randomNumber = util.RandomNumber
 var calculatePSNR = psnr.calculate
 
 function status(spec) {
@@ -111,7 +113,7 @@ function insert(spec) {
                 }
 
         if (usingRandom)
-            randomShuffle(noisyBitplanes)
+            randomShuffle(noisyBitplanes, new randomNumber(generateSeed(key)).next)
 
         if (noisyBitplanes.length*7 < dataBuffer.length)
             return Promise.reject('image too small')
@@ -120,7 +122,7 @@ function insert(spec) {
         for (let i = 0; messageI < dataBuffer.length; i++) {
             let bitplane = noisyBitplanes[i].bitplane
             bitplane[0] = intToArray(0xff, 8)
-            
+
             for (let j = 1; j < 8; j++) {
                 let mess = dataBuffer.length > messageI ? dataBuffer.readUInt8(messageI) : 0
                 for (let k = 0; k < 8; k++)
@@ -182,14 +184,19 @@ function retrieve(spec) {
                 for (let bitplaneI = 0; bitplaneI < 32; bitplaneI++) {
                     let bitplane = generateBitplane(imageBuffer, blockJ, blockI, bitplaneI)
                     if (complexity(bitplane) > threshold)
-                        noisyBitplanes.push(bitplane)
+                        noisyBitplanes.push({
+                            offsetX: blockJ,
+                            offsetY: blockI,
+                            offsetZ: bitplaneI,
+                            bitplane  
+                        })
                 }
 
         if (usingRandom)
-            randomShuffle(noisyBitplanes)
+            randomShuffle(noisyBitplanes, new randomNumber(generateSeed(key)).next)
 
         for (let i = 0; i < noisyBitplanes.length; i++) {
-            let bitplane = noisyBitplanes[i]
+            let bitplane = noisyBitplanes[i].bitplane
             if (arrayToInt(bitplane[0]) != 0xff)
                 bitplane = conjugate(bitplane)
             for (let j = 1; j < 8; j++)

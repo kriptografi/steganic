@@ -72,6 +72,7 @@ function retrieve(req, res, next) {
         res.header('X-Steganic-Filename', buffer.filename)
         res.send(buffer.message)
     }).catch(error => {
+        console.log(error)
         res.status(500).send(error)
     })
 }

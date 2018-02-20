@@ -85,7 +85,7 @@ function arrayToInt(array) {
 function generateSeed(key){
     let seed = 0
     for (let i = 0; i < key.length; i++)
-        seed += key.charCodeAt(i)
+        seed = seed*7 + key.charCodeAt(i)
     return seed
 }
 
@@ -104,19 +104,21 @@ function RandomNumber(seed) {
             else
                 this.seedB |= 1 << Math.floor(i / 2)
         }
+
+    this.next = function() {
+        this.lastNum = Math.round(Math.abs((this.lastNum * this.seedA + this.seedB) % 2147483647))
+        return this.lastNum
+    }.bind(this)
 }
-  
-RandomNumber.prototype.next = function () {
-    this.lastNum = Math.floor(Math.abs((this.lastNum * this.seedA + this.seedB) % 2147483647))
-    return this.lastNum
-};
 
 function randomShuffle(arr, randomizer) {
     for (let i = 0; i < arr.length; i++) {
         let pos = randomizer() % (arr.length - i)
-        let temp = arr[i]
-        arr[i] = arr[pos + i]
-        arr[pos + i] = temp
+        if (pos > 0) {
+            let temp = arr[i]
+            arr[i] = arr[pos + i]
+            arr[pos + i] = temp
+        }
     }
     return arr
 }
@@ -129,4 +131,4 @@ function copyImage(image) {
     })
 }
 
-module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt, copyImage, randomShuffle }
+module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt, copyImage, generateSeed, randomShuffle, RandomNumber }
