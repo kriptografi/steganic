@@ -80,4 +80,22 @@ function arrayToInt(array) {
     return num
 }
 
+function generateSeed(key){
+    let seed = 0
+    for (let i = 0; i < key.length; i++)
+        seed += key.charCodeAt(i)
+    return seed
+}
+
+function RandomNumber(seed) {
+    this.seedNum = seed % 2147483647;
+    if (this.seedNum <= 0) 
+        this.seedNum += 2147483646;
+}
+  
+RandomNumber.prototype.next = function () {
+    this.seedNum = this.seedNum * 16807 % 2147483647;
+    return this.seedNum
+};
+
 module.exports = { generateBitplane, putBitplane, conjugate, pbcToCgc, cgcToPbc, complexity, intToArray, arrayToInt }
