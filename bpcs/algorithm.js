@@ -2,6 +2,7 @@ var jimp = require('jimp')
 var bluebird = require('bluebird')
 var fs = bluebird.promisifyAll(require('fs'))
 var util = require('./util')
+var cipher = require('./cipher')
 
 var conjugate = util.conjugate
 var pbcToCgc = util.pbcToCgc
@@ -67,7 +68,7 @@ function insert(spec) {
         return dataBuffer
     })
     .then(buffer => {
-        buffer = vigenereEncrypt(buffer,key)
+        buffer = cipher.vigenereEncrypt(buffer,key)
 
         dataBuffer = Buffer.alloc(buffer.length + 4, 0)
         dataBuffer.writeInt32BE(buffer.length)
@@ -160,7 +161,7 @@ function retrieve(spec) {
 
         messageBuffer.copy(actualMessage, 0, 4)
 
-        return vigenereDecrypt(actualMessage, key)
+        return cipher.vigenereDecrypt(actualMessage, key)
     }).then(buffer => {
         let filename = ''
         let filenameSize = 0
@@ -179,36 +180,4 @@ function retrieve(spec) {
     })
 }
 
-function vigenereEncrypt(plaintext, key){
-    let ciphertext = Buffer.alloc(plaintext.length)
-    let j = 0
-    
-    for(let i = 0; i < plaintext.length; i++){
-        ciphertext[i] = (plaintext[i] + key.charCodeAt(j)) % 256
-        j++
-        j = j % key.length
-    }
-    return ciphertext
-}
-
-function vigenereDecrypt(ciphertext, key){
-    let plaintext = Buffer.alloc(ciphertext.length)
-    let j = 0
-
-    for(let i = 0; i < ciphertext.length; i++){
-        let x = ciphertext[i] - key.charCodeAt(j)
-        if(x < 0){
-            x = 256 - (key.charCodeAt(j) - ciphertext[i]) % 256
-        }else{
-            x = x % 256
-        }
-
-        plaintext[i] = x
-        j++
-        j = j % key.length
-    }
-
-    return plaintext
-}
-
-module.exports = {status, insert, vigenereEncrypt, vigenereDecrypt, retrieve}
+module.exports = {status, insert, retrieve}
